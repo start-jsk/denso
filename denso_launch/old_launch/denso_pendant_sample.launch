@@ -1,0 +1,11 @@
+<launch>
+  <include file="$(find denso_launch)/launch/denso_vs06_startup_real.launch" />
+  <node pkg="denso_pendant_publisher" type="denso_pendant_publisher"
+        name="denso_pendant_publisher" output="screen">
+    <param name="serial_device" value="/dev/ttyS1" /> <!--8ms-->
+  </node>
+  <node pkg="roseus" type="roseus" args="$(find open_controllers)/launch/vs060-pendant.l" name="pendant_bridge"/>
+  <group if="false">
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find open_controllers)/launch/vs060.vcg" />
+  </group>
+</launch>

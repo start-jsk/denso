@@ -1,0 +1,24 @@
+<launch>
+  <arg name="graph_time" default="120" />
+
+  <node name="$(anon rxplot)"
+        pkg="rxtools"
+        type="rxplot"
+        args="/diagnostics/status[0]/values[8]/value -t 'Overruns' -p $(arg graph_time)" />
+  <node name="$(anon rxplot)"
+        pkg="rxtools"
+        type="rxplot"
+        args="/diagnostics/status[0]/values[5]/value -t 'Total Loop Roundtrip(us)' -p $(arg graph_time) --ymin 900.0 --ymax 1100.0" />
+  <node name="$(anon rxplot)"
+        pkg="rxtools"
+        type="rxplot"
+        args="/diagnostics/status[0]/values[7]/value -t 'Jitter(us)' -p $(arg graph_time)" />
+  <node name="$(anon rxplot)"
+        pkg="rxtools"
+        type="rxplot"
+        args="/diagnostics/status[0]/values[12]/value -t 'Realtime Loop Frequency' -p $(arg graph_time) --ymin 900.0 --ymax 1100.0" />
+  <node name="$(anon rxplot)"
+        pkg="rxtools"
+        type="rxplot"
+        args="/realtime_loop/realtime/data -t 'Realtime Jitter(sec)' -b 5" />
+</launch>

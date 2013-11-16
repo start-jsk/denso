@@ -1,0 +1,15 @@
+<package>
+  <description brief="denso_controller">
+
+     denso_controller
+
+  </description>
+  <author>garaemon</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/denso_controller</url>
+<depend package="open_controllers_interface" />
+<depend package="roscpp" />
+</package>
+
+

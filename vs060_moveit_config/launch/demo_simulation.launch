@@ -1,0 +1,12 @@
+<launch>
+  <include file="$(find vs060_moveit_config)/launch/demo.launch">
+     <arg name="use_kinect" value="false" />
+     <arg name="use_rviz" value="false" />
+     <arg name="mode" value="simulation" />
+  </include>
+  <node name="rviz" pkg="rviz" type="rviz" respawn="true"
+	args="-d $(find vs060_moveit_config)/launch/moveit_simulation.rviz" output="screen">
+    <rosparam command="load" file="$(find vs060_moveit_config)/config/kinematics.yaml"/>
+  </node>
+
+</launch>

@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>@ on 2013/10/29 17:38</title>
+    <link rel='stylesheet' href='stylesheets/github.css' />
+    <link rel='stylesheet' href='stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='stylesheets/bootstrap-theme.min.css' />
+    <link rel="stylesheet/less" type="text/css" href="less/style.less" />
+    <script src="less-1.4.2.js" type="text/javascript"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <h1> irex_demo.py </h1>
+      </div>
+<div class="say-wrapper" id="say_526f740ca03e515fd5000001">
+  <div class="say">
+    <div class="say-content">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="markdown">
+            <div class="highlight highlight-python"><pre><span class="c">#!/usr/bin/env python                                                                                              </span>
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">Pose</span><span class="p">,</span> <span class="n">PoseStamped</span><span class="p">,</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Quaternion</span>
+<span class="kn">from</span> <span class="nn">moveit_commander</span> <span class="kn">import</span> <span class="n">MoveGroupCommander</span><span class="p">,</span> <span class="n">conversions</span>
+<span class="kn">from</span> <span class="nn">tf.transformations</span> <span class="kn">import</span> <span class="n">quaternion_from_euler</span>
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_call</span>
+
+<span class="n">rospy</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="s">"test_vs060_moveit"</span><span class="p">)</span>
+<span class="n">arm</span> <span class="o">=</span> <span class="n">MoveGroupCommander</span><span class="p">(</span><span class="s">"manipulator"</span><span class="p">)</span>
+
+<span class="n">SCENE_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">".."</span><span class="p">,</span> <span class="s">"model"</span><span class="p">,</span> <span class="s">"irex_model.scene"</span><span class="p">)</span>
+<span class="n">LOAD_SCENE_PROG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">".."</span><span class="p">,</span> <span class="s">"bin"</span><span class="p">,</span> <span class="s">"publish_scene_from_text"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">demo</span><span class="p">()</span> <span class="p">:</span>
+    <span class="c"># load scene                                                                                                   </span>
+    <span class="n">check_call</span><span class="p">([</span><span class="n">LOAD_SCENE_PROG</span><span class="p">,</span> <span class="n">SCENE_FILE</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[[</span> <span class="mf">0.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+              <span class="p">[</span> <span class="mf">0.6</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+    ,          <span class="p">[</span> <span class="mf">0.35</span><span class="p">,</span>  <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+              <span class="p">[</span> <span class="mf">0.6</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+              <span class="p">[</span> <span class="mf">0.4</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]]:</span>
+        <span class="k">print</span> <span class="s">"set_pose_target("</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s">")"</span>
+        <span class="n">pose</span> <span class="o">=</span> <span class="n">PoseStamped</span><span class="p">(</span><span class="n">header</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Header</span><span class="p">(</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">frame_id</span> <span class="o">=</span> <span class="s">'/BASE'</span><span class="p">),</span>
+                           <span class="n">pose</span> <span class="o">=</span> <span class="n">Pose</span><span class="p">(</span><span class="n">position</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">),</span>
+                                       <span class="n">orientation</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">(</span><span class="o">*</span><span class="n">quaternion_from_euler</span><span class="p">(</span><span class="mf">1.57</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.57</span><span class="p">,</span> <span class="s">'sxyz'</span><span class="p">))))</span>
+
+        <span class="n">arm</span><span class="o">.</span><span class="n">set_pose_target</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
+        <span class="n">arm</span><span class="o">.</span><span class="n">go</span><span class="p">()</span> <span class="ow">or</span> <span class="n">arm</span><span class="o">.</span><span class="n">go</span><span class="p">()</span> <span class="ow">or</span> <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="s">"arm.go fails"</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rospy</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+            <span class="k">return</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+        <span class="n">demo</span><span class="p">()</span>
+
+</pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      
+    </div>
+  </body>
+  
+</html>

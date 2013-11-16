@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='ASCII'?>
+<package>
+  <description brief="vs060">
+
+      vs060
+
+  </description>
+  <author>Ryohei Ueda(START-JSK)</author>
+  <license>NDA</license>
+  <review status="unreviewed" notes=""/>
+  <depend package="kinematics_base"/>
+  <depend package="planning_environment"/>
+  <depend package="arm_kinematics_constraint_aware"/>
+  <depend package="ompl_ros_interface"/>
+  <depend package="trajectory_filter_server"/>
+  <depend package="constraint_aware_spline_smoother"/>
+  <depend package="move_arm"/>
+  <depend package="moveit_ros_planning"/>
+  <depend package="roscpp"/>
+  <depend package="rosconsole"/>
+  <!-- <export> -->
+  <!--   <kinematics_base plugin="${prefix}/kinematics_plugins.xml"/> -->
+  <!-- </export> -->
+</package>

@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='ASCII'?>
+<library path="lib/libVS060A1_AV6_NNN_NNN_kinematics_lib">
+  <class name="VS060A1_AV6_NNN_NNN_manipulator_kinematics/IKFastKinematicsPlugin" type="VS060A1_AV6_NNN_NNN_manipulator_kinematics::IKFastKinematicsPlugin" base_class_type="kinematics::KinematicsBase">
+    <description>IKFast61 plugin for closed-form kinematics</description>
+  </class>
+</library>

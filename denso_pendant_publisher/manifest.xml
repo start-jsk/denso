@@ -1,0 +1,15 @@
+<package>
+  <description brief="denso_pendant_publisher">
+
+     denso_pendant_publisher
+
+  </description>
+  <author>garaemon</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/denso_pendant_publisher</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+</package>
+
+

@@ -1,0 +1,17 @@
+<package>
+  <description brief="denso_launch">
+
+     denso_launch
+
+  </description>
+  <author>JSK User</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/denso_launch</url>
+  <depend package="denso_controller" />
+  <depend package="control_msgs" />
+  <!-- depend package="vs060A1_AV6_NNN_NNN_arm_navigation" / -->
+  <!-- depend package="vs060_moveit_config" / -->
+</package>
+
+

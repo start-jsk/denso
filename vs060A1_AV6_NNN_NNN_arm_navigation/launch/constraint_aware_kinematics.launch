@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='ASCII'?>
+<launch>
+  <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/VS060A1_AV6_NNN_NNN_planning_environment.launch"/>
+  <node pkg="arm_kinematics_constraint_aware" type="arm_kinematics_constraint_aware" name="VS060A1_AV6_NNN_NNN_manipulator_kinematics" respawn="true">
+    <param name="group" type="string" value="manipulator"/>
+    <param name="manipulator/root_name" type="string" value="BASE"/>
+    <param name="manipulator/tip_name" type="string" value="Flange"/>
+    <param name="kinematics_solver" type="string" value="VS060A1_AV6_NNN_NNN_manipulator_kinematics/IKFastKinematicsPlugin"/>
+    <param name="OLDkinematics_solver" type="string" value="arm_kinematics_constraint_aware/KDLArmKinematicsPlugin"/>
+  </node>
+</launch>

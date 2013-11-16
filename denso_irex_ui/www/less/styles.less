@@ -1,0 +1,41 @@
+#urdf {
+      height: 400px;
+}
+
+@max-width: 625px;
+@viewer-width: 400px;
+.container {
+    max-width: none !important;
+    width: @max-width;
+    background-color: white;
+}
+
+body {
+    background-color: red;
+}    
+
+
+.viewer-region {
+  width: @viewer-width;
+  float: left;
+}
+.info-region {
+   width: @max-width - @viewer-width;
+   float: left;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-top: 10px;
+}
+  .two-mode-button {
+    width: (@max-width - @viewer-width - 10px * 2) / 2.0;
+  }
+  .rosinfo-message {
+    font-size: 6px;
+    font-family: serif;
+  }
+  #message-region {
+    padding-top: 10px;
+  }
+     .alert {
+     font-size: 12px;
+  }

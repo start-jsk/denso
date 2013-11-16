@@ -1,0 +1,14 @@
+<launch>
+  <include file="$(find denso_launch)/launch/denso_vs060_moveit_demo.launch" />
+  <node pkg="denso_pendant_publisher"
+        type="denso_pendant_publisher"
+        name="denso_pendant_publisher">
+  </node>
+  <!-- web -->
+  <node pkg="roswww" type="webserver.py" name="roswww">
+  </node>
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+    <arg name="port" value="8888" />
+  </include>
+  <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher" />
+</launch>

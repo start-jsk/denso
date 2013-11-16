@@ -1,0 +1,3 @@
+<launch>
+  <include file="$(find vs060_moveit_config)/launch/demo_simulation.launch" />
+</launch>

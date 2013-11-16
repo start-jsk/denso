@@ -1,0 +1,94 @@
+multi_dof_joints:
+  - name: world_joint
+    type: Floating
+    parent_frame_id: BASE
+    child_frame_id: BASE
+groups:
+  - name: manipulator
+    base_link: BASE
+    tip_link: Flange
+default_collision_operations:
+  - object1: BASE
+    object2: J1
+    operation: disable  # Adjacent in collision
+  -
+    object1: J1
+    object2: J2
+    operation: disable  # Adjacent in collision
+  -
+    object1: J2
+    object2: J3
+    operation: disable  # Adjacent in collision
+  -
+    object1: J3
+    object2: J4
+    operation: disable  # Adjacent in collision
+  -
+    object1: J4
+    object2: J5
+    operation: disable  # Adjacent in collision
+  -
+    object1: J5
+    object2: Flange
+    operation: disable  # Adjacent in collision
+  -
+    object1: BASE
+    object2: Flange
+    operation: disable  # Never in collision
+  -
+    object1: BASE
+    object2: J2
+    operation: disable  # Never in collision
+  -
+    object1: BASE
+    object2: J3
+    operation: disable  # Never in collision
+  -
+    object1: BASE
+    object2: J4
+    operation: disable  # Never in collision
+  -
+    object1: BASE
+    object2: J5
+    operation: disable  # Never in collision
+  -
+    object1: Flange
+    object2: J1
+    operation: disable  # Never in collision
+  -
+    object1: Flange
+    object2: J2
+    operation: disable  # Never in collision
+  -
+    object1: Flange
+    object2: J3
+    operation: disable  # Never in collision
+  -
+    object1: Flange
+    object2: J4
+    operation: disable  # Never in collision
+  -
+    object1: J1
+    object2: J3
+    operation: disable  # Never in collision
+  -
+    object1: J1
+    object2: J4
+    operation: disable  # Never in collision
+  -
+    object1: J1
+    object2: J5
+    operation: disable  # Never in collision
+  -
+    object1: J2
+    object2: J4
+    operation: disable  # Never in collision
+  -
+    object1: J2
+    object2: J5
+    operation: disable  # Never in collision
+  -
+    object1: J3
+    object2: J5
+    operation: disable  # Never in collision
+    

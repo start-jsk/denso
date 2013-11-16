@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/rwt_utils_3rdparty/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet/less" type="text/css"
+          href="less/styles.less"/>
+    <script src="/rwt_utils_3rdparty/less-1.4.1.min.js"
+            type="text/javascript">
+    </script>
+    <title>IREX</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="" id="pendant-messages">
+      </div>
+      <div class="row">
+        <div class="viewer-region">
+          <div id="urdf"></div>
+        </div>
+        <div class="info-region">
+          <div style="display: none;">
+            <div class="btn-group"> <!-- key button -->
+              <button type="button" class="btn btn-default disabled mode-button" id="auto-button">Auto</button>
+              <button type="button" class="btn btn-default disabled mode-button" id="manual-button">Manual</button>
+              <button type="button" class="btn btn-default disabled mode-button" id="teach-button">Teach</button>
+            </div>
+          </div>
+          <div id="status-button">
+            <div class="btn-group"> <!-- key button -->
+              <button type="button" class="btn btn-default disabled two-mode-button" id="running-button">Running</button>
+              <button type="button" class="btn btn-default disabled two-mode-button" id="stop-button">Stopped</button>
+            </div>
+          </div>
+          <div id="message-region">
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript"
+            src="/rwt_utils_3rdparty/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="/ros3djs/ros3djs/include/threejs/three.js"></script>
+    <script type="text/javascript"
+            src="/ros3djs/ros3djs/include/ColladaAnimationCompress/ColladaLoader2.js"></script>
+    <script type="text/javascript"
+            src="/roslibjs/eventemitter2.min.js"></script>
+    <script type="text/javascript"
+            src="/roslibjs/roslibjs/build/roslib.js"></script>
+    <script type="text/javascript"
+            src="/ros3djs/ros3djs/build/ros3d.js"></script>
+    <script type="text/javascript"
+            src="/ros3djs_experimental/ros3d_experimental.js"></script>
+    <script type="text/javascript"
+            src="/rwt_utils_3rdparty/lodash.min.js"></script>
+    <script type="text/javascript"
+            src="/rwt_utils_3rdparty/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+            src="/denso_irex_ui/main.js"></script>
+  </body>
+</html>
+

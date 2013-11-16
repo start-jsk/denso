@@ -1,0 +1,38 @@
+arm_controller:
+  type: "robot_mechanism_controllers/JointTrajectoryActionController"
+  joints:
+    - j1
+    - j2
+    - j3
+    - j4
+    - j5
+    - flange
+  gains:
+    j1: {p: 1.0, d: 0, i: 0}
+    j2: {p: 1.0, d: 0, i: 0}
+    j3: {p: 1.0, d: 0, i: 0}
+    j4: {p: 1.0, d: 0, i: 0}
+    j5: {p: 1.0, d: 0, i: 0}
+    flange: {p: 1.0, d: 0, i: 0}
+  joint_trajectory_action_node:
+    joints:
+      - j1
+      - j2
+      - j3
+      - j4
+      - j5
+      - flage
+    constraints:
+      goal_time: 0.6
+      j1:
+        goal: 0.02
+      j2:
+        goal: 0.02
+      j3:
+        goal: 0.02
+      j4:
+        goal: 0.02
+      j5:
+        goal: 0.02
+      flange:
+        goal: 0.02
