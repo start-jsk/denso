@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <package>
   <name>densowave</name>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <description>The densowave package</description>
 
   <maintainer email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</maintainer>
   <maintainer email="iisaito@opensource-robotics.tokyo.jp">Isaac Isao Saito</maintainer>
   <license>BSD</license>
   <author>Ryohei Ueda</author>
+  <author email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</author>
   <author email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</author>
-
   <url type="website">http://wiki.ros.org/densowave</url>
-  <url type="bugtracker">https://github.com/start-jsk/open-industrial-ros-controllers/issues</url>
-  <url type="repository">https://github.com/start-jsk/open-industrial-ros-controllers</url>
+  <url type="bugtracker">https://github.com/start-jsk/densowave/issues</url>
+  <url type="repository">https://github.com/start-jsk/densowave</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>denso_controller</run_depend>

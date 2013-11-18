@@ -8,12 +8,13 @@
   <author email="assistant@moveit.ros.org">MoveIt Setup Assistant</author>
   <author email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</author>
   <maintainer email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</maintainer>
+  <maintainer email="iisaito@opensource-robotics.tokyo.jp">Isaac Isao Saito</maintainer>
 
   <license>BSD</license>
-
+  <url type="website">http://wiki.ros.org/vs060_moveit_config</url>
   <url type="website">http://moveit.ros.org/</url>
-  <url type="bugtracker">https://github.com/ros-planning/moveit_setup_assistant/issues</url>
-  <url type="repository">https://github.com/ros-planning/moveit_setup_assistant</url>
+  <url type="bugtracker">https://github.com/start-jsk/densowave/issues</url>
+  <url type="repository">https://github.com/start-jsk/densowave</url>
 
   <run_depend>moveit_planners_ompl</run_depend>
   <run_depend>moveit_ros_move_group</run_depend>
