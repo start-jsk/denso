@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/VS060A1_AV6_NNN_NNN_planning_environment.launch" />
+    <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/vs060A1_AV6_NNN_NNN_planning_environment.launch" />
     <include file="$(find planning_environment)/launch/planning_environment_visualization_prerequisites.launch" />
     <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/constraint_aware_kinematics.launch" />
     <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/ompl_planning.launch" />

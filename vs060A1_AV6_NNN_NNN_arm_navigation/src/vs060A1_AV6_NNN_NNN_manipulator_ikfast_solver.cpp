@@ -3000,7 +3000,7 @@ IKSolver solver;
 return solver.ComputeIk(eetrans,eerot,pfree,solutions);
 }
 
-IKFAST_API const char* GetKinematicsHash() { return "<robot:genericrobot - VS060A1_AV6_NNN_NNN (9b55cb5f892d57f8cf94303da0a7b5ab)>"; }
+IKFAST_API const char* GetKinematicsHash() { return "<robot:genericrobot - vs060A1_AV6_NNN_NNN (9b55cb5f892d57f8cf94303da0a7b5ab)>"; }
 
 IKFAST_API const char* GetIkFastVersion() { return IKFAST_STRINGIZE(IKFAST_VERSION); }
 

@@ -11,7 +11,7 @@
 	</asset>
 	<library_visual_scenes id="vscenes">
 		<visual_scene id="vscene" name="Visual Scene">
-			<node id="visual1" name="VS060A1_AV6_NNN_NNN" sid="visual1">
+			<node id="visual1" name="vs060A1_AV6_NNN_NNN" sid="visual1">
 				<translate>0 0 0</translate>
 				<rotate>1 0 0 0</rotate>
 		<node id="v1.node0" name="BASE" sid="node0">
@@ -640,7 +640,7 @@
 		</material>
 	</library_materials>
 	<library_kinematics_models id="kmodels">
-		<kinematics_model id="kmodel1" name="VS060A1_AV6_NNN_NNN">
+		<kinematics_model id="kmodel1" name="vs060A1_AV6_NNN_NNN">
 			<asset>
 				<subject>densowave rc7</subject>
 			</asset>
@@ -1896,7 +1896,7 @@
 	</library_articulated_systems>
 	<library_kinematics_scenes id="kscenes">
 		<kinematics_scene id="kscene" name="Kinematics Scene">
-			<instance_articulated_system sid="body1_motion_inst" url="#body1_motion" name="VS060A1_AV6_NNN_NNN">
+			<instance_articulated_system sid="body1_motion_inst" url="#body1_motion" name="vs060A1_AV6_NNN_NNN">
 				<newparam sid="kscene_kmodel1_inst">
 					<SIDREF>body1_motion/body1_motion_kmodel1_inst</SIDREF>
 				</newparam>
@@ -1956,7 +1956,7 @@
 		</physics_scene>
 	</library_physics_scenes>
 	<library_physics_models id="pmodels">
-		<physics_model id="pmodel1" name="VS060A1_AV6_NNN_NNN">
+		<physics_model id="pmodel1" name="vs060A1_AV6_NNN_NNN">
 			<rigid_body sid="rigid0" name="BASE">
 				<technique_common>
 					<dynamic>true</dynamic>

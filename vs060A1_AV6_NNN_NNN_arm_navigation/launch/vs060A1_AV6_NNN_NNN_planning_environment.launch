@@ -1,4 +1,4 @@
 <launch>
-    <param name="robot_description" textfile="$(find vs060)/model/VS060A1_AV6_NNN_NNN.urdf" />
-    <rosparam command="load" ns="robot_description_planning" file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/config/VS060A1_AV6_NNN_NNN_planning_description.yaml" />
+    <param name="robot_description" textfile="$(find vs060)/model/vs060A1_AV6_NNN_NNN.urdf" />
+    <rosparam command="load" ns="robot_description_planning" file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/config/vs060A1_AV6_NNN_NNN_planning_description.yaml" />
 </launch>

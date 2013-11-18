@@ -30,6 +30,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 # Library containing IKFast plugin 
-rosbuild_add_library(VS060A1_AV6_NNN_NNN_kinematics_lib
-  src/VS060A1_AV6_NNN_NNN_manipulator_ikfast_plugin.cpp
+rosbuild_add_library(vs060A1_AV6_NNN_NNN_kinematics_lib
+  src/vs060A1_AV6_NNN_NNN_manipulator_ikfast_plugin.cpp
   )

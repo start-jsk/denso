@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/VS060A1_AV6_NNN_NNN_planning_environment.launch" />
+    <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/vs060A1_AV6_NNN_NNN_planning_environment.launch" />
     <include file="$(find planning_environment)/launch/environment_server.launch">
         <arg name="use_monitor" value="true" />
         <arg name="use_collision_map" value="false" />

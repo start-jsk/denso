@@ -20,12 +20,12 @@
   </include>
 
   <include ns="move_group" file="$(find vs060_moveit_config)/launch/trajectory_execution.launch" if="$(arg allow_trajectory_execution)">
-    <arg name="moveit_controller_manager" value="VS060A1_AV6_NNN_NNN" /> 
+    <arg name="moveit_controller_manager" value="vs060A1_AV6_NNN_NNN" /> 
     <arg name="moveit_manage_controllers" value="true" />
   </include>
 
   <include ns="move_group" file="$(find vs060_moveit_config)/launch/sensor_manager.launch" if="$(arg allow_trajectory_execution)">
-    <arg name="moveit_sensor_manager" value="VS060A1_AV6_NNN_NNN" /> 
+    <arg name="moveit_sensor_manager" value="vs060A1_AV6_NNN_NNN" /> 
   </include>
 
   <node name="move_group" launch-prefix="$(arg launch_prefix)" pkg="moveit_ros_move_group" type="move_group" respawn="false" output="screen" args="$(arg command_args)">

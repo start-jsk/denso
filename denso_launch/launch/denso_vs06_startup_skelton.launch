@@ -3,7 +3,7 @@
   <arg name="controller_ip" default="133.11.216.51" />
   <node pkg="denso_controller" type="main" name="realtime_loop"
         gdb-launch-prefix="xterm -e gdb --args"
-        args="-x $(find vs060)/model/VS060A1_AV6_NNN_NNN.urdf -s $(arg controller_argument)" output="screen">
+        args="-x $(find vs060)/model/vs060A1_AV6_NNN_NNN.urdf -s $(arg controller_argument)" output="screen">
     <param name="udp_timeout" value="9000" />
     <!-- <param name="udp_timeout" value="100000" /> -->
     <param name="server_ip" value="$(arg controller_ip)" />
@@ -14,9 +14,9 @@
   <node pkg="pr2_controller_manager" type="spawner" name="pr2_controller_manager"
         args="arm_controller" output="screen" />
   <rosparam file="$(find denso_controller)/denso_controllers.yaml" command="load" />
-  <param name="robot_description" textfile="$(find vs060)/model/VS060A1_AV6_NNN_NNN.urdf" />
+  <param name="robot_description" textfile="$(find vs060)/model/vs060A1_AV6_NNN_NNN.urdf" />
    <!-- <param name="robot_description" -->
-   <!--        textfile="$(find open_industrial_web_interface)/resources/VS060A1_AV6_NNN_NNN.urdf" /> -->
+   <!--        textfile="$(find open_industrial_web_interface)/resources/vs060A1_AV6_NNN_NNN.urdf" /> -->
   <arg name="graph_time" default="10" />
   <node pkg="robot_state_publisher" type="state_publisher" name="state_publisher" />
   <group if="false">

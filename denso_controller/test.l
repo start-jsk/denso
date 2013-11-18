@@ -5,7 +5,7 @@
 (load "package://denso_launch/vs060-interface.l")
 (load "package://pr2eus/robot-interface.l")
 (ros::roseus "vs060_test")
-(setq *vs060* (VS060A1_AV6_NNN_NNN))
+(setq *vs060* (vs060A1_AV6_NNN_NNN))
 (setq *ri* (instance vs060-interface :init :robot *vs060*))
 
 ;; -6.0

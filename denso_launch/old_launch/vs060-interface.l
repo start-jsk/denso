@@ -18,8 +18,8 @@
   )
 
 (defun vs060-init ()
-  (setq *ri* (instance vs060-interface :init :robot (VS060A1_AV6_NNN_NNN)))
-  (setq *vs060* (VS060A1_AV6_NNN_NNN))
+  (setq *ri* (instance vs060-interface :init :robot (vs060A1_AV6_NNN_NNN)))
+  (setq *vs060* (vs060A1_AV6_NNN_NNN))
   ;;(if (not (boundp '*irtviewer*)) (make-irtviewer))
   ;;(objects (list *vs060*))
   ;;(send *irtviewer* :draw-objects)

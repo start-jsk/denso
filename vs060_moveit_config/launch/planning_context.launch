@@ -3,10 +3,10 @@
   <arg name="load_robot_description" default="false"/>
 
   <!-- Load universal robotic description format (URDF) -->
-  <param if="$(arg load_robot_description)" name="robot_description" textfile="$(find vs060)/model/VS060A1_AV6_NNN_NNN.urdf" />
+  <param if="$(arg load_robot_description)" name="robot_description" textfile="$(find vs060)/model/vs060A1_AV6_NNN_NNN.urdf" />
       
   <!-- The semantic description that corresponds to the URDF -->
-  <param name="robot_description_semantic" textfile="$(find vs060_moveit_config)/config/VS060A1_AV6_NNN_NNN.srdf" />
+  <param name="robot_description_semantic" textfile="$(find vs060_moveit_config)/config/vs060A1_AV6_NNN_NNN.srdf" />
   
   <!-- Load to the parameter server yaml files -->
   <group ns="robot_description_planning">    

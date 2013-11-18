@@ -1,13 +1,13 @@
 <launch>
   <param name="/use_sim_time" value="true" />
-  <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/VS060A1_AV6_NNN_NNN_planning_environment.launch" />
+  <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/vs060A1_AV6_NNN_NNN_planning_environment.launch" />
   <node pkg="planning_environment" name="wall_clock_server" type="fake_time.py" />
 
   <param name="warehouse_host" value="localhost"/>
   <param name="warehouse_port" value="27020"/>
   <node name="mongo" type="wrapper.py" pkg="mongodb">
     <param name="overwrite" value="false"/>
-    <param name="database_path" value="arm_navigation_dbs/VS060A1_AV6_NNN_NNN"/>
+    <param name="database_path" value="arm_navigation_dbs/vs060A1_AV6_NNN_NNN"/>
   </node>
 
   <include file="$(find planning_environment)/launch/environment_server.launch">
@@ -22,12 +22,12 @@
 
   <node name="interpolated_ik_node_right" pkg="interpolated_ik_motion_planner" 
 	type="interpolated_ik_motion_planner.py" args="r" respawn="false" output="screen">
-    <param name="robot_prefix" type="string" value="VS060A1_AV6_NNN_NNN"/>
+    <param name="robot_prefix" type="string" value="vs060A1_AV6_NNN_NNN"/>
     <param name="consistent_angle" type="double" value="1.05"/>
   </node>
   <node name="interpolated_ik_node_left" pkg="interpolated_ik_motion_planner" 
 	type="interpolated_ik_motion_planner.py" args="l" respawn="false" output="screen">
-    <param name="robot_prefix" type="string" value="VS060A1_AV6_NNN_NNN"/>
+    <param name="robot_prefix" type="string" value="vs060A1_AV6_NNN_NNN"/>
     <param name="consistent_angle" type="double" value="1.05"/>
   </node>
 
@@ -39,13 +39,13 @@
   <!-- Called when right arm executes trajectory using controllers -->
   <param name="execute_right_trajectory" value="none" />
   <!-- Called to get left arm inverse kinematics with collision checking -->
-  <param name="left_ik_name" value="/VS060A1_AV6_NNN_NNN_manipulator_kinematics/get_constraint_aware_ik" />
+  <param name="left_ik_name" value="/vs060A1_AV6_NNN_NNN_manipulator_kinematics/get_constraint_aware_ik" />
   <!-- Called to get right arm inverse kinematics with collision checking -->
-  <param name="right_ik_name" value="/VS060A1_AV6_NNN_NNN_none_kinematics/get_constraint_aware_ik" />
+  <param name="right_ik_name" value="/vs060A1_AV6_NNN_NNN_none_kinematics/get_constraint_aware_ik" />
   <!-- Called to get left arm inverse kinematics without collision checking -->
-  <param name="non_coll_left_ik_name" value="/VS060A1_AV6_NNN_NNN_manipulator_kinematics/get_ik" />
+  <param name="non_coll_left_ik_name" value="/vs060A1_AV6_NNN_NNN_manipulator_kinematics/get_ik" />
   <!-- Called to get right arm inverse kinematics without collision checking -->
-  <param name="non_coll_right_ik_name" value="/VS060A1_AV6_NNN_NNN_none_kinematics/get_ik" />
+  <param name="non_coll_right_ik_name" value="/vs060A1_AV6_NNN_NNN_none_kinematics/get_ik" />
   <!-- Kinematic chain group name representing the left arm -->
   <param name="left_arm_group" value="manipulator" />
   <!-- Kinematic chain group name representing the right arm -->
