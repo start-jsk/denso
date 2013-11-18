@@ -6,20 +6,17 @@
 
   <license>BSD</license>
 
-
   <author email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roslang</build_depend>
-  <build_depend>roscpp</build_depend>
   <build_depend>moveit_ros_planning</build_depend>
   <build_depend>open_controllers_interface</build_depend>
-
-
-  <run_depend>roslang</run_depend>
-  <run_depend>roscpp</run_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslang</build_depend>
   <run_depend>moveit_ros_planning</run_depend>
   <run_depend>open_controllers_interface</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslang</run_depend>
 
 </package>

@@ -6,7 +6,8 @@
      An automatically generated package with all the configuration and launch files for using the vs060A1_AV6_NNN_NNN with the MoveIt Motion Planning Framework
   </description>
   <author email="assistant@moveit.ros.org">MoveIt Setup Assistant</author>
-  <maintainer email="assistant@moveit.ros.org">MoveIt Setup Assistant</maintainer>
+  <author email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</author>
+  <maintainer email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</maintainer>
 
   <license>BSD</license>
 
@@ -14,8 +15,8 @@
   <url type="bugtracker">https://github.com/ros-planning/moveit_setup_assistant/issues</url>
   <url type="repository">https://github.com/ros-planning/moveit_setup_assistant</url>
 
-  <run_depend>moveit_ros_move_group</run_depend>
   <run_depend>moveit_planners_ompl</run_depend>
+  <run_depend>moveit_ros_move_group</run_depend>
 
   <buildtool_depend>catkin</buildtool_depend>
   
