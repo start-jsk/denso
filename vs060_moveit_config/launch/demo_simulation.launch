@@ -5,7 +5,9 @@
      <arg name="mode" value="simulation" />
   </include>
   <node name="rviz" pkg="rviz" type="rviz" respawn="true"
-	args="-d $(find vs060_moveit_config)/launch/moveit_simulation.rviz" output="screen">
+	args="-d $(find vs060_moveit_config)/launch/moveit.rviz" output="screen">
+
+
     <rosparam command="load" file="$(find vs060_moveit_config)/config/kinematics.yaml"/>
   </node>
 
