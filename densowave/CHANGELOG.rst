@@ -2,6 +2,9 @@
 Changelog for package densowave
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.2.2 (2013-12-06)
 ------------------
 * Improvement to .rviz files
