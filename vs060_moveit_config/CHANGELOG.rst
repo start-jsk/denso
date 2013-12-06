@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Improvement to .rviz files
+* Contributors: Isao Isaac Saito
+
 0.2.1 (2013-12-06)
 ------------------
 * Rename a file to start with lowercase to follow common naming custom
