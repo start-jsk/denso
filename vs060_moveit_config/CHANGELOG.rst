@@ -2,8 +2,8 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.2 (2013-12-06)
+------------------
 * Improvement to .rviz files
 * Contributors: Isao Isaac Saito
 
