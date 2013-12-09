@@ -58,9 +58,8 @@ running_pub = rospy.Publisher("/irex_demo_running", std_msgs.msg.Bool);
 #cancel_pub = rospy.Publisher("/arm_controller/follow_joint_trajectory/cancel", actionlib_msgs.msg.GoalID);
 cancel_pub = rospy.Publisher("/move_group/cancel", actionlib_msgs.msg.GoalID);
 
-#TODO: These are rosbuild-based. Need to be catkinized.
+# Get paths for files used later.
 _rospack = RosPack()
-#SCENE_FILE = os.path.join(os.path.dirname(__file__), "..", "model", "irex_model.scene")
 SCENE_FILE = _rospack.get_path('vs060') + '/model/irex_model.scene'
 _path_rosroot = rospy.get_ros_root()
 _len_cut = len(_path_rosroot) - len('/share/ros')  # This is used to get ros root path /opt/%DISTRO% path.
