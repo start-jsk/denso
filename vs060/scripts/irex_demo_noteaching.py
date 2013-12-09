@@ -34,6 +34,8 @@
 #
 # Author: Isaac Isao Saito
 
+#%Tag(FULLTEXT)%
+
 import os
 from subprocess import check_call
 
@@ -95,4 +97,4 @@ def demo() :
 if __name__ == "__main__":
     while not rospy.is_shutdown():
         demo()
-
+#%EndTag(FULLTEXT)%
