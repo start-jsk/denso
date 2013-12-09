@@ -4,6 +4,8 @@ project(vs060)
 
 find_package(catkin REQUIRED COMPONENTS roslang roscpp open_controllers_interface moveit_ros_planning)
 
+catkin_python_setup()
+
 catkin_package(
   DEPENDS
   CATKIN-DEPENDS roslang roscpp open_controllers_interface moveit_ros_planning
