@@ -2,6 +2,11 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add a demo script that runs w/o pendant.
+* Contributors: Isao Isaac Saito
+
 0.2.3 (2013-12-07)
 ------------------
 

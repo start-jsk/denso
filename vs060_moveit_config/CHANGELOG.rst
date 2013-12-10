@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add launch file that emulates demo environment at iREX without the need of pendant device.
+* Contributors: Isao Isaac Saito
+
 0.2.3 (2013-12-07)
 ------------------
 
