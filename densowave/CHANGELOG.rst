@@ -2,6 +2,9 @@
 Changelog for package densowave
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.2.4 (2013-12-10)
 ------------------
 * add a demo script that runs w/o pendant.

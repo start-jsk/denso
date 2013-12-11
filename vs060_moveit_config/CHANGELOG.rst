@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add launch files to enable standalone demos.
+* Contributors: Isao Isaac Saito
+
 0.2.4 (2013-12-10)
 ------------------
 * Add launch file that emulates demo environment at iREX without the need of pendant device.

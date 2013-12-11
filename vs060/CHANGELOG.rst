@@ -2,6 +2,12 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* (vs060) Corrected scripts' install path.
+* (vs060) add a demo script that runs w/o pendant.
+* Contributors: Isao Isaac Saito
+
 0.2.4 (2013-12-10)
 ------------------
 * add a demo script that runs w/o pendant.
