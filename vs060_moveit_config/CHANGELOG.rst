@@ -2,8 +2,8 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.5 (2013-12-11)
+------------------
 * add launch files to enable standalone demos.
 * Contributors: Isao Isaac Saito
 
