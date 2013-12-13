@@ -2,13 +2,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vs060)
 
-find_package(catkin REQUIRED COMPONENTS roslang roscpp open_controllers_interface moveit_ros_planning)
-
-catkin_python_setup()
+find_package(catkin REQUIRED COMPONENTS roslang roscpp open_controllers_interface moveit_commander moveit_ros_planning)
 
 catkin_package(
   DEPENDS
-  CATKIN-DEPENDS roslang roscpp open_controllers_interface moveit_ros_planning
+  CATKIN-DEPENDS roslang roscpp open_controllers_interface moveit_commander moveit_ros_planning
   INCLUDE_DIRS
   LIBRARIES
 )
@@ -23,8 +21,5 @@ install(TARGETS publish_scene_from_text
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
 install(DIRECTORY model DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
-
-
+install(DIRECTORY scripts DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION} USE_SOURCE_PERMISSIONS)
