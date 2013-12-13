@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix to https://github.com/start-jsk/densowave/issues/15
+* Contributors: Isao Isaac Saito
+
 0.2.5 (2013-12-11)
 ------------------
 * add launch files to enable standalone demos.
