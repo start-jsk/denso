@@ -2,8 +2,8 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.6 (2013-12-13)
+------------------
 * fix to https://github.com/start-jsk/densowave/issues/15
 * Contributors: Isao Isaac Saito
 

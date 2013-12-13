@@ -2,8 +2,8 @@
 Changelog for package densowave
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.6 (2013-12-13)
+------------------
 * Remove manifest.xml since the entire package depends on wet packages open_industrial_ros_controllers.
 * Contributors: Isao Isaac Saito
 

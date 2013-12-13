@@ -1,6 +1,6 @@
 <package>
   <name>denso_launch</name>
-  <version>0.2.5</version>
+  <version>0.2.6</version>
   <description>denso_launch</description>
   <maintainer email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</maintainer>
   <maintainer email="iisaito@opensource-robotics.tokyo.jp">Isaac Isao Saito</maintainer>
