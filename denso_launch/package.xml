@@ -5,9 +5,9 @@
   <maintainer email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</maintainer>
   <maintainer email="iisaito@opensource-robotics.tokyo.jp">Isaac Isao Saito</maintainer>
   <author email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</author>
-  <url type="website">http://wiki.ros.org/densowave</url>
-  <url type="bugtracker">https://github.com/start-jsk/densowave/issues</url>
-  <url type="repository">https://github.com/start-jsk/densowave</url>
+  <url type="website">http://wiki.ros.org/denso</url>
+  <url type="bugtracker">https://github.com/start-jsk/denso/issues</url>
+  <url type="repository">https://github.com/start-jsk/denso</url>
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>

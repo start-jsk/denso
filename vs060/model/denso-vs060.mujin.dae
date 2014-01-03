@@ -642,7 +642,7 @@
 	<library_kinematics_models id="kmodels">
 		<kinematics_model id="kmodel1" name="vs060A1_AV6_NNN_NNN">
 			<asset>
-				<subject>densowave rc7</subject>
+				<subject>denso rc7</subject>
 			</asset>
 			<technique_common>
 				<joint name="j1" sid="joint0">
@@ -1203,7 +1203,7 @@
 					<max_tool_speed_trans>1.7</max_tool_speed_trans>
 					<max_tool_accel_rot>22.382276860500482</max_tool_accel_rot>
 					<max_tool_accel_trans>9.4440000000000008</max_tool_accel_trans>
-					<robot_controller>densowave rc7</robot_controller>
+					<robot_controller>denso rc7</robot_controller>
 					<robot_simulation_file/>
 				</technique>
 			</extra>

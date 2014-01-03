@@ -2,15 +2,15 @@
   <name>denso_controller</name>
   <version>0.2.6</version>
   <description>
-   <p>This packages a common controller functionality for Denso Wave's industrial manipulators based on <a href = "http://goo.gl/kL0vnf">ORiN</a> (Open Robot interface for the Network), a unified network interface for industrial robot applications.</p>
+   <p>This packages a common controller functionality for Denso's industrial manipulators based on <a href = "http://goo.gl/kL0vnf">ORiN</a> (Open Robot interface for the Network), a unified network interface for industrial robot applications.</p>
   </description>
   <maintainer email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</maintainer>
   <maintainer email="iisaito@opensource-robotics.tokyo.jp">Isaac Isao Saito</maintainer>
   <license>BSD</license>
   <author email="ueda@jsk.t.u-tokyo.ac.jp">Ryohei Ueda</author>
   <url type="website">http://wiki.ros.org/denso_controller</url>
-  <url type="bugtracker">https://github.com/start-jsk/densowave/issues</url>
-  <url type="repository">https://github.com/start-jsk/densowave</url>
+  <url type="bugtracker">https://github.com/start-jsk/denso/issues</url>
+  <url type="repository">https://github.com/start-jsk/denso</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>open_controllers_interface</build_depend>

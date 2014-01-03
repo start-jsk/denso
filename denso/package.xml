@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>densowave</name>
+  <name>denso</name>
   <version>0.2.6</version>
-  <description><p>Packages in the densowave suite provide controller functionality for Denso Wave's industrial manipulators. </p>
+  <description><p>Packages in the denso suite provide controller functionality for Denso's industrial manipulators. </p>
    <p><a href = "http://goo.gl/kL0vnf">ORiN</a> (Open Robot interface for the Network) is a unified network interface for industrial robot applications and has been stably utilized in Denso's manipulators for years. Controllers in this package suite uses b-CAP, UDP-based control protocol defined in ORiN. It also has mechanism to detect faulty commands. Using b-CAP, ROS communicates to the embedded controller computer that has been achieving industry-proven reliability. The computer also has mechanism to detect faulty commands. That said as a whole the system maintains the same level of safeness with their commercial product setting.</p>
    <p>Also, as a genuine ROS package, it enables robot application developers to access full ROS features. MoveIt! configuration package is also included for some of Denso's robots.</p>
    <p>Core functionality </p>
@@ -13,9 +13,9 @@
   <license>BSD</license>
   <author>Ryohei Ueda</author>
   <author email="k-okada@jsk.t.u-tokyo.ac.jp">Kei Okada</author>
-  <url type="website">http://wiki.ros.org/densowave</url>
-  <url type="bugtracker">https://github.com/start-jsk/densowave/issues</url>
-  <url type="repository">https://github.com/start-jsk/densowave</url>
+  <url type="website">http://wiki.ros.org/denso</url>
+  <url type="bugtracker">https://github.com/start-jsk/denso/issues</url>
+  <url type="repository">https://github.com/start-jsk/denso</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>denso_controller</run_depend>

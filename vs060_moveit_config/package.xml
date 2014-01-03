@@ -13,8 +13,8 @@
   <license>BSD</license>
   <url type="website">http://wiki.ros.org/vs060_moveit_config</url>
   <url type="website">http://moveit.ros.org/</url>
-  <url type="bugtracker">https://github.com/start-jsk/densowave/issues</url>
-  <url type="repository">https://github.com/start-jsk/densowave</url>
+  <url type="bugtracker">https://github.com/start-jsk/denso/issues</url>
+  <url type="repository">https://github.com/start-jsk/denso</url>
 
   <run_depend>moveit_planners_ompl</run_depend>
   <run_depend>moveit_ros_move_group</run_depend>

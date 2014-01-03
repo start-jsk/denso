@@ -1,5 +1,5 @@
 <stack>
-  <description brief="densowave">The densowave stack constains libraries, configuration files, and ROS nodes for controlling a densowave robot</description>
+  <description brief="denso">The denso stack constains libraries, configuration files, and ROS nodes for controlling a denso robot</description>
   <author>Ryohei Ueda(START-JSK)</author>
   <license>NDA</license>  
   <review status="unreviewed" notes=""/>
