@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Rename repository (Fix https://github.com/start-jsk/denso/issues/13, https://github.com/start-jsk/denso/issues/14)
+* Contributors: Isao Isaac Saito
+
 0.2.6 (2013-12-13)
 ------------------
 * fix to https://github.com/start-jsk/denso/issues/15

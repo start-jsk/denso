@@ -2,6 +2,11 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Rename repository (Fix https://github.com/start-jsk/denso/issues/13, https://github.com/start-jsk/denso/issues/14)
+* Contributors: Isao Isaac Saito
+
 0.2.6 (2013-12-13)
 ------------------
 * Remove manifest.xml since the entire package depends on wet packages open_industrial_ros_controllers.
