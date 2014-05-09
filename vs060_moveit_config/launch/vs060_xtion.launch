@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find denso_launch)/launch/denso_vs060_moveit_demo.launch"/>
+  <!-- xtion -->
+  <include file="$(find denso_launch)/launch/xtion.launch"/>
+</launch>
