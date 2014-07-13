@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find denso_launch)/launch/denso_vs06_startup_real.launch" />
+  <include file="$(find denso_launch)/launch/denso_vs060_startup_real.launch" />
   <node pkg="denso_pendant_publisher" type="denso_pendant_publisher"
         name="denso_pendant_publisher" output="screen">
     <param name="serial_device" value="/dev/ttyS1" /> <!--8ms-->
