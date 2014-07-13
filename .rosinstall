@@ -1,0 +1,4 @@
+- git:
+    uri: https://github.com/start-jsk/open_industrial_ros_controllers.git
+    local-name: start-jsk/open_industrial_ros_controllers
+
