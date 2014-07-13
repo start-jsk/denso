@@ -2,7 +2,7 @@
     <arg name="LAUNCH_OPENNI" default="true" />
     <arg name="LAUNCH_DENSO" default="true" />
     <include if="$(arg LAUNCH_DENSO)"
-             file="$(find denso_launch)/launch/denso_vs06_startup_simulation.launch" />
+             file="$(find denso_launch)/launch/denso_vs060_startup_simulation.launch" />
     <include file="$(find vs060A1_AV6_NNN_NNN_arm_navigation)/launch/vs060A1_AV6_NNN_NNN_planning_environment.launch" />
     <!--include file="$(find planning_environment)/launch/planning_environment_visualization_prerequisites.launch" /-->
     <include file="$(find planning_environment)/launch/environment_server.launch">

@@ -30,6 +30,6 @@
     <include file="$(find vs060_moveit_config)/launch/robot_self_filter.launch" />
   </group>
   <group if="$(arg include_startup_launch)">
-  <include file="$(find denso_launch)/launch/denso_vs06_startup_$(arg mode).launch" />
+  <include file="$(find denso_launch)/launch/denso_vs060_startup_$(arg mode).launch" />
   </group>
 </launch>
