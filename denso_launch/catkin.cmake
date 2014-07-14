@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(denso_launch)
 
-find_package(catkin REQUIRED COMPONENTS denso_controller control_msgs vs060_moveit_config)
+find_package(catkin REQUIRED COMPONENTS denso_controller control_msgs vs060_moveit_config rostest)
 
 catkin_package(
   DEPENDS
@@ -12,5 +12,7 @@ catkin_package(
 )
 
 install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+add_rostest(launch/denso_vs060_moveit_demo_simulation.launch)
 
 
