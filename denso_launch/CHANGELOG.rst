@@ -2,8 +2,8 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.8 (2014-07-30)
+------------------
 * Add xtion checkerboard demo launch file.
 * Add moveit_commander test
 * Correct robot name (vs06 -> vs060)

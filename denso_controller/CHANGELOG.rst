@@ -2,8 +2,8 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.8 (2014-07-30)
+------------------
 * (denso_controller) Corrected copyright
 * Comfort to ROS Cpp style guide. Start adding comments (sorry two different types of commits mixed up here...editor did it and I can't revert it)
 * Contributors: Isaac IY Saito

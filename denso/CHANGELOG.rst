@@ -2,8 +2,8 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.8 (2014-07-30)
+------------------
 * Add xtion checkerboard demo launch file.
 * vs060_moveit_config/launch/moveit.rviz: add robot model to rviz
 * Corrected build_dependency (add robot_mechanism_controllers, robot_state_publisher)
