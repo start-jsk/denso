@@ -2,6 +2,12 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* (denso_controller) Corrected copyright
+* Comfort to ROS Cpp style guide. Start adding comments (sorry two different types of commits mixed up here...editor did it and I can't revert it)
+* Contributors: Isaac IY Saito
+
 0.2.7 (2014-01-03)
 ------------------
 * Rename repository (Fix https://github.com/start-jsk/denso/issues/13, https://github.com/start-jsk/denso/issues/14)

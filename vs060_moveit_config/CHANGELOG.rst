@@ -2,6 +2,14 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add xtion checkerboard demo launch file.
+* vs060_moveit_config/launch/moveit.rviz: add robot model to rviz
+* Corrected build_dependency (add robot_mechanism_controllers, robot_state_publisher)
+* Correct robot name (vs06 -> vs060)
+* Contributors: Isaac IY Saito, Kei Okada
+
 0.2.7 (2014-01-03)
 ------------------
 * Rename repository (Fix https://github.com/start-jsk/denso/issues/13, https://github.com/start-jsk/denso/issues/14)

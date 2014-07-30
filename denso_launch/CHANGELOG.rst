@@ -2,6 +2,14 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add xtion checkerboard demo launch file.
+* Add moveit_commander test
+* Correct robot name (vs06 -> vs060)
+* Add rostest for /denso_vs060_moveit_demo_simulation.launch
+* Contributors: Isaac IY Saito, Kei Okada
+
 0.2.7 (2014-01-03)
 ------------------
 * Rename repository (Fix https://github.com/start-jsk/denso/issues/13, https://github.com/start-jsk/denso/issues/14)
