@@ -2,6 +2,19 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add xtion checkerboard demo launch file.
+* vs060_moveit_config/launch/moveit.rviz: add robot model to rviz
+* Corrected build_dependency (add robot_mechanism_controllers, robot_state_publisher)
+* Correct robot name (vs06 -> vs060)
+* Rename repository (Fix https://github.com/start-jsk/denso/issues/13, https://github.com/start-jsk/denso/issues/14)
+* Add moveit_commander test
+* Add rostest for /denso_vs060_moveit_demo_simulation.launch
+* Corrected copyright (only for some packages)
+* Comfort to ROS Cpp style guide. Start adding comments (sorry two different types of commits mixed up here...editor did it and I can't revert it)
+* Contributors: Kei Okada, Isaac IY Saito
+
 0.2.7 (2014-01-03)
 ------------------
 * Rename repository (Fix https://github.com/start-jsk/denso/issues/13, https://github.com/start-jsk/denso/issues/14)
