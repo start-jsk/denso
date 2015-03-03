@@ -1,0 +1,8 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: vs060
+    relative_path: model/vs060A1_AV6_NNN_NNN.urdf
+  SRDF:
+    relative_path: config/vs060A1_AV6_NNN_NNN.srdf
+  CONFIG:
+    generated_timestamp: 1408435901
