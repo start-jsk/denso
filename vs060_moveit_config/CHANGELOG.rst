@@ -2,6 +2,12 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add missing .setup_assistant file, without which moveit_setup_assistant can't open an existing moveit config pkg.
+* Check-off query start state from RViz conf.
+* Contributors: Isaac IY Saito
+
 0.2.8 (2014-07-30)
 ------------------
 * Add xtion checkerboard demo launch file.
