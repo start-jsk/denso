@@ -2,8 +2,8 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.9 (2015-03-07)
+------------------
 * Add missing .setup_assistant file, without which moveit_setup_assistant can't open an existing moveit config pkg.
 * Check-off query start state from RViz conf.
 * Contributors: Isaac IY Saito
