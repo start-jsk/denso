@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot>
+
+  <!-- ros_control plugin -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/vs060A1_AV6_NNN_NNN</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+
+  <!-- BASE link -->
+  <gazebo reference="BASE">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <!-- J1 link -->
+  <gazebo reference="J1">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <!-- J2 link -->
+  <gazebo reference="J2">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <!-- J3 link -->
+  <gazebo reference="J3">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <!-- J4 link -->
+  <gazebo reference="J4">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <!-- J5 link -->
+  <gazebo reference="J5">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <!-- Flange link -->
+  <gazebo reference="Flange">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+</robot>
