@@ -32,14 +32,14 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/BASE_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/BASE_mesh.stl"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/BASE_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/BASE_mesh.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -54,14 +54,14 @@
     <visual>
       <origin xyz="0 4.04121e-17 0.182" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J1_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J1_mesh.stl"/>
       </geometry>
       <material name="orange"/>
     </visual>
     <collision>
       <origin xyz="0 4.04121e-17 0.182" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J1_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J1_mesh.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -76,14 +76,14 @@
     <visual>
       <origin xyz="0 3.61933e-17 0.163" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J2_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J2_mesh.stl"/>
       </geometry>
       <material name="orange"/>
     </visual>
     <collision>
       <origin xyz="0 3.61933e-17 0.163" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J2_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J2_mesh.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -98,14 +98,14 @@
     <visual>
       <origin xyz="0 6.77236e-17 0.305" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J3_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J3_mesh.stl"/>
       </geometry>
       <material name="orange"/>
     </visual>
     <collision>
       <origin xyz="0 6.77236e-17 0.305" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J3_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J3_mesh.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -120,14 +120,14 @@
     <visual>
       <origin xyz="-0.01 3.66374e-17 0.165" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J4_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J4_mesh.stl"/>
       </geometry>
       <material name="orange"/>
     </visual>
     <collision>
       <origin xyz="-0.01 3.66374e-17 0.165" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J4_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J4_mesh.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -142,14 +142,14 @@
     <visual>
       <origin xyz="0 2.9976e-17 0.135" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J5_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J5_mesh.stl"/>
       </geometry>
       <material name="orange"/>
     </visual>
     <collision>
       <origin xyz="0 2.9976e-17 0.135" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/J5_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/J5_mesh.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -164,14 +164,14 @@
     <visual>
       <origin xyz="0 1.55431e-17 0.07" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/Flange_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/Flange_mesh.stl"/>
       <material name="orange"/>
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 1.55431e-17 0.07" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://vs060/model/meshes/Flange_mesh.dae"/>
+        <mesh filename="package://vs060/model/meshes/Flange_mesh.stl"/>
       </geometry>
     </collision>
     <inertial>
