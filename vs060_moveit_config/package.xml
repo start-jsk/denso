@@ -26,6 +26,7 @@
   <run_depend>pr2_moveit_plugins</run_depend>
   <run_depend>robot_mechanism_controllers</run_depend>
   <run_depend>robot_state_publisher</run_depend>
+  <run_depend>moveit_cartesian_plan_plugin</run_depend>
   <run_depend>moveit_planners_ompl</run_depend>
   <run_depend>moveit_ros_move_group</run_depend>
   <run_depend>moveit_ros_visualization</run_depend>
