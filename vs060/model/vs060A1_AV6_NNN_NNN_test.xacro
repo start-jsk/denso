@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<robot name="vs060A1_AV6_NNN_NNN"
+       xmlns:xacro="http://www.ros.org/wiki/xacro"
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
+       xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
+       xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics">
+
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find vs060)/model/vs060A1_AV6_NNN_NNN_test.gazebo" />
+  <!-- Import colors -->
+  <xacro:include filename="$(find vs060)/model/materials.xacro" />
+
+  <!-- Used for fixing robot to Gazebo 'base_link' -->
+  <link name="world"/>
+
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="BASE"/>
+  </joint>
+
+  <!-- Base Link -->
+  <link name="BASE">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/BASE_mesh.stl"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/BASE_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1000" />
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <inertia ixx="20" ixy="0" ixz="0" iyy="20" iyz="0" izz="20"/>
+    </inertial>
+  </link>
+
+  <!-- J1 Link -->
+  <link name="J1">
+    <visual>
+      <origin xyz="0 4.04121e-17 0.182" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J1_mesh.stl"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0 4.04121e-17 0.182" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J1_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="4.327" />
+      <origin xyz="0.013885 -0.005997 0.043991" rpy="0 -0 0"/>
+      <inertia ixx="0.025492" ixy="0" ixz="0" iyy="0.032502" iyz="-3.26672e-18" izz="0.01779"/>
+    </inertial>
+  </link>
+
+  <!-- J2 Link -->
+  <link name="J2">
+    <visual>
+      <origin xyz="0 3.61933e-17 0.163" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J2_mesh.stl"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0 3.61933e-17 0.163" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J2_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="9.475" />
+      <origin xyz="0.015837 -0.073696 0.010087" rpy="0 -0 0"/>
+      <inertia ixx="0.108024" ixy="0" ixz="0" iyy="0.025579" iyz="1.93827e-17" izz="0.112871"/>
+    </inertial>
+  </link>
+
+  <!-- J3 Link -->
+  <link name="J3">
+    <visual>
+      <origin xyz="0 6.77236e-17 0.305" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J3_mesh.stl"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0 6.77236e-17 0.305" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J3_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="4.097" />
+      <origin xyz="0.011544 -0.057408 0.006203" rpy="0 -0 0"/>
+      <inertia ixx="0.015999" ixy="0" ixz="0" iyy="0.00638" iyz="2.33191e-18" izz="0.016882"/>
+    </inertial>
+  </link>
+
+  <!-- J4 Link -->
+  <link name="J4">
+    <visual>
+      <origin xyz="-0.01 3.66374e-17 0.165" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J4_mesh.stl"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.01 3.66374e-17 0.165" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J4_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.779" />
+      <origin xyz="0.003998 -0.004975 0.052919" rpy="0 -0 0"/>
+      <inertia ixx="0.005106" ixy="0" ixz="0" iyy="0.005266" iyz="-5.87308e-19" izz="0.002621"/>
+    </inertial>
+  </link>
+
+  <!-- J5 Link -->
+  <link name="J5">
+    <visual>
+      <origin xyz="0 2.9976e-17 0.135" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J5_mesh.stl"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0 2.9976e-17 0.135" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/J5_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.211" />
+      <origin xyz="0.011902 -0.004739 0.010398" rpy="0 -0 0"/>
+      <inertia ixx="0.001093" ixy="0" ixz="0" iyy="0.001629" iyz="-3.10862e-21" izz="0.001615"/>
+    </inertial>
+  </link>
+
+  <!-- Flange Link -->
+  <link name="Flange">
+    <visual>
+      <origin xyz="0 1.55431e-17 0.07" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/Flange_mesh.stl"/>
+      <material name="orange"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 1.55431e-17 0.07" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://vs060/model/meshes/Flange_mesh.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="4.154" />
+      <origin xyz="-0.000401015 0.0770342 0.0962886" rpy="0 -0 0"/>
+      <inertia ixx="0.0216473" ixy="-0.000147026" ixz="-0.00011778" iyy="0.0346876" iyz="0.00159321" izz="0.022927"/>
+    </inertial>
+  </link>
+
+  <!-- joint -->
+  <joint name="joint_j1" type="revolute">
+    <parent link="BASE"/>
+    <child  link="J1"/>
+    <origin xyz="0 4.04121e-17 0.182" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-2.96706" upper="2.96706" effort="19.7336" velocity="0.5" />
+  </joint>
+
+  <joint name="joint_j2" type="revolute">
+    <parent link="J1"/>
+    <child  link="J2"/>
+    <origin xyz="0 3.61933e-17 0.163" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-2.0944" upper="2.0944" effort="16.8447" velocity="0.5" />
+  </joint>
+
+  <joint name="joint_j3" type="revolute">
+    <parent link="J2"/>
+    <child  link="J3"/>
+    <origin xyz="0 6.77236e-17 0.305" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-2.18166" upper="2.70526" effort="20.7089" velocity="0.5" />
+  </joint>
+
+  <joint name="joint_j4" type="revolute">
+    <parent link="J3"/>
+    <child  link="J4"/>
+    <origin xyz="-0.01 3.66374e-17 0.165" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-4.71239" upper="4.71239" effort="20.9665" velocity="0.5" />
+  </joint>
+
+  <joint name="joint_j5" type="revolute">
+    <parent link="J4"/>
+    <child  link="J5"/>
+    <origin xyz="0 2.9976e-17 0.135" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-2.0944" upper="2.0944" effort="23.7229" velocity="0.5" />
+  </joint>
+
+  <joint name="joint_flange" type="revolute">
+    <parent link="J5"/>
+    <child  link="Flange"/>
+    <origin xyz="0 1.55431e-17 0.07" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-6.28319" upper="6.28319" effort="33.5103" velocity="0.5" />
+  </joint>
+
+  <!-- transission -->
+  <transmission name="tran_j1">
+    <type>pr2_mechanism_model/SimpleTransmission</type>
+    <joint name="joint_j1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_j1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran_j2">
+    <type>pr2_mechanism_model/SimpleTransmission</type>
+    <joint name="joint_j2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_j2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran_j3">
+    <type>pr2_mechanism_model/SimpleTransmission</type>
+    <joint name="joint_j3">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_j3">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran_j4">
+    <type>pr2_mechanism_model/SimpleTransmission</type>
+    <joint name="joint_j4">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_j4">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran_j5">
+    <type>pr2_mechanism_model/SimpleTransmission</type>
+    <joint name="joint_j5">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_j5">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+</robot>
