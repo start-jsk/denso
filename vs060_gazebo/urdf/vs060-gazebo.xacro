@@ -150,37 +150,12 @@
     </inertial>
   </link>
   
-  <!-- Camera -->
-  <link name="camera_link">
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-	<box size="0.02 0.05 0.05"/>
-      </geometry>
-    </collision>
-
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-	<box size="0.02 0.05 0.05"/>
-      </geometry>
-      <material name="green"/>
-    </visual>
-
-    <inertial>
-      <mass value="1e-5" />
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
-    </inertial>
-  </link>
-  
   <joint name="j1" type="revolute">
     <parent link="BASE"/>
     <child  link="link_1"/>
     <origin xyz="0 4.04121e-17 0.182" rpy="0 -0 0 "/>
     <axis   xyz="0 0 1"/>
     <limit lower="-2.96706" upper="2.96706" effort="19.7336" velocity="3.2" />
-    
   </joint>
   
   <joint name="j2" type="revolute">
@@ -222,12 +197,5 @@
     <axis   xyz="0 0 1"/>
     <limit lower="-6.2831853" upper="6.2831853" effort="28.0" velocity="3.2"/>    
   </joint>
-  
-  <joint name="camera_joint" type="fixed">
-    <axis xyz="0 0 1" />
-    <origin xyz="0 0 0" rpy="3.14 -1.57 0"/>
-    <parent link="Flange"/>
-    <child link="camera_link"/>
-  </joint>  
   
 </robot>
