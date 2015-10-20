@@ -330,10 +330,6 @@ public:
     }
     if (FAILED(hr))
     {
-      // hr = bCapRobotExecute("stopLog", "");
-      // if (FAILED(hr)) {
-      //   fprintf(stderr, "failed to disable logging mode\n");
-      // }
       ROS_FATAL("Failed to call bCapRobotSlvMove: %02x", hr);
       if (hr == BCAP_E_BUF_FULL)
       {
