@@ -65,7 +65,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
 #define BCAP_CONNECTION_UDP 1
-#include "b-Cap.c"
+#include "b-Cap.h"
 
 #define DEFAULT_SERVER_IP_ADDRESS               "133.11.216.196"                /* Your controller IP address */
 #define DEFAULT_SERVER_PORT_NUM                 5007

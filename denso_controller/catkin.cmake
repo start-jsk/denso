@@ -11,9 +11,10 @@ catkin_package(
   LIBRARIES
 )
 
-include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+include_directories(include src ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-add_executable(main src/main.cpp)
+set_source_files_properties(src/b-Cap.c PROPERTIES LANGUAGE CXX)
+add_executable(main src/b-Cap.c src/main.cpp)
 target_link_libraries(main ${catkin_LIBRARIES})
 
 install(TARGETS main

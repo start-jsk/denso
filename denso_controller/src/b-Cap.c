@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 /* OS Switching */
 #ifdef WIN32
@@ -1842,7 +1843,7 @@ StartPoint:
                         if (retryp) {
                           failed_to_send_packet = 1;
                           ++retry_count;
-                          ROS_WARN("should retry %u (%d)", pSndPacket->iSerialNo, retry_count);
+                          fprintf(stderr, "should retry %u (%d)", pSndPacket->iSerialNo, retry_count);
                           pSndPacket->iReserved = pSndPacket->iSerialNo;
                           pSndPacket->iSerialNo = ++m_iSerialNo;
 
