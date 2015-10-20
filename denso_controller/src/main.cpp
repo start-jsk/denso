@@ -579,6 +579,7 @@ public:
     if (!dryrunp)
     {
       need_exit = true;
+      BCAP_HRESULT hr;
       ROS_INFO("bCapOpen");
       bCapOpen();
       ROS_INFO("bCapServerStart");
@@ -597,7 +598,7 @@ public:
 
       {
         ROS_WARN("bCapMotor On");
-        BCAP_HRESULT hr = bCapMotor(true);
+        hr = bCapMotor(true);
         if (FAILED(hr))
         {
           ROS_FATAL("failed to motor on");
@@ -608,7 +609,7 @@ public:
       // sleep(15);
       // // read joint angles sometimes to skip illegal values
       std::vector<double> cur_jnt;
-      BCAP_HRESULT hr = bCapCurJnt(cur_jnt);
+      hr = bCapCurJnt(cur_jnt);
       // 100 * 50m = 5000
       // for (int i = 0; i < 5000 / 20; i++) {
       //   cur_jnt = bCapCurJnt();
@@ -653,7 +654,7 @@ public:
       {
         vntPose.Value.DoubleArray[i] = cur_jnt[i];
       }
-      BCAP_HRESULT hr = BCAP_S_OK;
+      hr = BCAP_S_OK;
       while (hr == 0 && g_halt_requested == false)
       {
         hr = bCapRobotSlvMove(&vntPose, &vntResult);
