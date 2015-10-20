@@ -644,7 +644,23 @@ public:
         }
       }
 
-      //sleep(5);
+      ROS_INFO("bCap connection trial");
+      hr = bCapCurJnt(cur_jnt);
+      BCAP_VARIANT vntPose, vntResult;
+      vntPose.Type = VT_R8 | VT_ARRAY;
+      vntPose.Arrays = 8;
+      for (int i = 0; i < 8; i++)
+      {
+        vntPose.Value.DoubleArray[i] = cur_jnt[i];
+      }
+      BCAP_HRESULT hr = BCAP_S_OK;
+      while (hr == 0 && g_halt_requested == false)
+      {
+        hr = bCapRobotSlvMove(&vntPose, &vntResult);
+        ROS_INFO("send initialization slvmove");
+      }
+      ROS_INFO("initialization done");
+
       // fill ac
       int i = 0;
       for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
