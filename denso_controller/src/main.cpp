@@ -188,20 +188,15 @@ public:
     return hr;
   }
 
-  std::vector<double> bCapCurJnt()
+  BCAP_HRESULT bCapCurJnt(std::vector<double>& jointvalues)
   {
-    double dJnt[8];
+    jointvalues.resize(8);
     BCAP_HRESULT hr = BCAP_E_FAIL;
-    std::vector<double> ret;
     while (FAILED(hr))
     {
-      hr = bCap_RobotExecute(iSockFD, lhRobot, "CurJnt", "", &dJnt);
+      hr = bCap_RobotExecute(iSockFD, lhRobot, "CurJnt", "", &jointvalues[0]);
       if (SUCCEEDED(hr))
       {
-        ret.resize(8);
-        for (int i = 0; i < 8; i++) {
-          ret.at(i) = dJnt[i];
-        }
         break;
       }
       else
@@ -209,7 +204,7 @@ public:
         fprintf(stderr, "failed to read joint angles, retry\n");
       }
     }
-    return ret;
+    return hr;
   }
 
   BCAP_HRESULT bCapSlvChangeMode(char* arg)
@@ -261,18 +256,20 @@ public:
     {
       double tm = (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND)
           - (prev_time.tv_sec + double(prev_time.tv_nsec) / NSEC_PER_SECOND);
+      current_vel.resize(6);
       for (size_t i = 0; i < 6; i++)
       {
-        current_vel.push_back((current_angle[i] - prev_angle[i]) / tm);
+        current_vel.at(i) = (current_angle[i] - prev_angle[i]) / tm;
       }
     }
     if (prev_vel.size() > 0)
     {
       double tm = (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND)
           - (prev_time.tv_sec + double(prev_time.tv_nsec) / NSEC_PER_SECOND);
+      current_acc.resize(6);
       for (size_t i = 0; i < 6; i++)
       {
-        current_acc.push_back((current_vel[i] - prev_vel[i]) / tm);
+        current_acc.at(i) = (current_vel[i] - prev_vel[i]) / tm;
       }
     }
 
@@ -439,50 +436,7 @@ public:
 
   bool updateJoints(struct timespec* spec_result)
   {
-    static bool initialp = true;
-    bool errorp = false;
-    if (initialp)
-    {
-      ROS_INFO("first loop");
-
-      initialp = false;
-      std::vector<double> cur_jnt;
-      if (!dryrunp)
-      {
-        ROS_INFO("bCap initialization");
-        cur_jnt = bCapCurJnt();
-        BCAP_VARIANT vntPose, vntResult;
-        vntPose.Type = VT_R8 | VT_ARRAY;
-        vntPose.Arrays = 8;
-        for (int i = 0; i < 8; i++)
-        {
-          vntPose.Value.DoubleArray[i] = cur_jnt[i];
-        }
-        BCAP_HRESULT hr = BCAP_S_OK;
-        while (hr == 0 && g_halt_requested == false)
-        {
-          hr = bCapRobotSlvMove(&vntPose, &vntResult);
-          ROS_INFO("initialize slvmove");
-        }
-        ROS_INFO("initialization done");
-      }
-      // fill ac
-      int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
-      { // *** js and ac must be consistent
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
-        if (!dryrunp)
-        {
-          ac->state_.position_ = DEG2RAD(cur_jnt[i]);
-        }
-        else
-        {
-          ac->state_.position_ = 0;
-        }
-        i++;
-      }
-    }
+    
     // build vntPose
     BCAP_VARIANT vntPose;
     vntPose.Type = VT_R8 | VT_ARRAY;
@@ -657,7 +611,8 @@ public:
       }
       // sleep(15);
       // // read joint angles sometimes to skip illegal values
-      std::vector<double> cur_jnt = bCapCurJnt();
+      std::vector<double> cur_jnt;
+      BCAP_HRESULT hr = bCapCurJnt(cur_jnt);
       // 100 * 50m = 5000
       // for (int i = 0; i < 5000 / 20; i++) {
       //   cur_jnt = bCapCurJnt();
@@ -705,9 +660,9 @@ public:
       }
       setUDPTimeout(0, udp_timeout);
       sleep(5);
-      bCapCurJnt();
-      bCapCurJnt();
-      bCapCurJnt();
+      for (int j = 0; j < 3; j++) {
+          bCapCurJnt(cur_jnt);
+      }
       // for (int i = 0; i < 5; i++)
       //   bCapRobotSlvMove(&vntPose, &vntResult);
       // hr = bCapRobotSlvMove(&vntPose, &vntResult);
