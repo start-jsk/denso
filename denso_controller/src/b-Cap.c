@@ -1837,12 +1837,8 @@ StartPoint:
                         struct timespec recv_after_time;
                         clock_gettime(CLOCK_MONOTONIC, &recv_after_time);
                         const int NSEC_PER_SECOND = 1e+9;
-                        fprintf(stderr, "send time: %f\n", 
-                                (send_after_time.tv_sec + double(send_after_time.tv_nsec)/NSEC_PER_SECOND)- (prev_time.tv_sec + double(prev_time.tv_nsec)/NSEC_PER_SECOND) );
-                        fprintf(stderr, "recv time: %f\n", 
-                                (recv_after_time.tv_sec + double(recv_after_time.tv_nsec)/NSEC_PER_SECOND) - (send_after_time.tv_sec + double(send_after_time.tv_nsec)/NSEC_PER_SECOND)
-                                );
-
+                        //fprintf(stderr, "send time: %f\n", (send_after_time.tv_sec + double(send_after_time.tv_nsec)/NSEC_PER_SECOND)- (prev_time.tv_sec + double(prev_time.tv_nsec)/NSEC_PER_SECOND) );
+                        //fprintf(stderr, "recv time: %f\n", (recv_after_time.tv_sec + double(recv_after_time.tv_nsec)/NSEC_PER_SECOND) - (send_after_time.tv_sec + double(send_after_time.tv_nsec)/NSEC_PER_SECOND)); 
                         if (retryp) {
                           failed_to_send_packet = 1;
                           ++retry_count;
