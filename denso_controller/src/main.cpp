@@ -198,9 +198,10 @@ public:
       hr = bCap_RobotExecute(iSockFD, lhRobot, "CurJnt", "", &dJnt);
       if (SUCCEEDED(hr))
       {
-        for (int i = 0; i < 8; i++)
-          ret.push_back(dJnt[i]);
-        fprintf(stderr, "CurJnt : %f %f %f %f %f %f\n", dJnt[0], dJnt[1], dJnt[2], dJnt[3], dJnt[4], dJnt[5], dJnt[6]);
+        ret.resize(7);
+        for (int i = 0; i < 8; i++) {
+          ret.at(i) = dJnt[i];
+        }
         break;
       }
       else
@@ -450,7 +451,7 @@ public:
       std::vector<double> cur_jnt;
       if (!dryrunp)
       {
-        ROS_INFO("hoge");
+        ROS_INFO("bCap initialization");
         cur_jnt = bCapCurJnt();
         BCAP_VARIANT vntPose, vntResult;
         vntPose.Type = VT_R8 | VT_ARRAY;
