@@ -198,7 +198,7 @@ public:
       hr = bCap_RobotExecute(iSockFD, lhRobot, "CurJnt", "", &dJnt);
       if (SUCCEEDED(hr))
       {
-        ret.resize(7);
+        ret.resize(8);
         for (int i = 0; i < 8; i++) {
           ret.at(i) = dJnt[i];
         }
