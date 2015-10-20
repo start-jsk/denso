@@ -353,7 +353,7 @@ public:
       sleep(1);
       long lResult;
       BCAP_HRESULT hr = BCAP_S_OK;
-      bCapClearError();
+      //bCapClearError();
 
       hr = bCapSlvChangeMode((char*)"0");
       if (FAILED(hr))
