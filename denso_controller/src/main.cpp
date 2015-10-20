@@ -80,7 +80,7 @@ class DensoController : public OpenControllersInterface::OpenController
 {
 public:
   DensoController() :
-      OpenControllersInterface::OpenController(), loop(true)
+      OpenControllersInterface::OpenController()
   {
   }
 #define SAFE_EXIT(exit_code) {                  \
@@ -92,7 +92,6 @@ public:
   {
     OpenController::start();
   }
-  bool loop;
 private:
   char* server_ip_address;
   int server_port_number;
@@ -101,7 +100,6 @@ private:
   u_int lhController;
   u_int lhRobot;
   int udp_timeout;
-  bool need_exit;
 public:
   /**
    * Open a bCap socket.
