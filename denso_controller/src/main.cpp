@@ -669,7 +669,7 @@ public:
           it != cm->model_.transmissions_.end(); ++it)
       { // *** js and ac must be consistent
         pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
-        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> degree
+        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
         i++;
       }
       setUDPTimeout(0, udp_timeout);
