@@ -80,7 +80,7 @@ class DensoController : public OpenControllersInterface::OpenController
 {
 public:
   DensoController() :
-      OpenControllersInterface::OpenController(), need_exit(false), loop(true)
+      OpenControllersInterface::OpenController(), loop(true)
   {
   }
 #define SAFE_EXIT(exit_code) {                  \
@@ -578,7 +578,6 @@ public:
     // for denso connection
     if (!dryrunp)
     {
-      need_exit = true;
       BCAP_HRESULT hr;
       ROS_INFO("bCapOpen");
       bCapOpen();
@@ -634,7 +633,6 @@ public:
       //   }
       // }
 
-      need_exit = false;
       {
         BCAP_HRESULT hr = bCapSlvChangeMode((char*)"514"); // 0x202
         //BCAP_HRESULT hr = bCapSlvChangeMode((char*)"258"); // 0x102
@@ -731,10 +729,7 @@ public:
     fprintf(stderr, "DensoController::quitRequest\n");
     OpenController::quitRequest(); // call super class
     fprintf(stderr, "DensoController::quitRequest called\n");
-    if (need_exit)
-    {
-      exit(1);
-    }
+    ros::shutdown();
   }
 };
 
