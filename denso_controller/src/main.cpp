@@ -362,19 +362,21 @@ public:
       sleep(1);
       long lResult;
       BCAP_HRESULT hr = BCAP_S_OK;
-      //bCapClearError();
-      // disable logging mode
-      hr = bCapRobotExecute("stopLog", "");
-      if (FAILED(hr))
-      {
-        fprintf(stderr, "failed to disable logging mode\n");
-      }
+      bCapClearError();
 
       hr = bCapSlvChangeMode((char*)"0");
       if (FAILED(hr))
       {
         fprintf(stderr, "failed to change slave mode\n");
       }
+
+      // disable logging mode
+      // hr = bCapRobotExecute("stopLog", "");
+      // if (FAILED(hr))
+      // {
+      //   fprintf(stderr, "failed to disable logging mode\n");
+      // }
+
       hr = bCapMotor(false);
       if (FAILED(hr))
       {
