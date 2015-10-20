@@ -337,14 +337,10 @@ public:
       // if (FAILED(hr)) {
       //   fprintf(stderr, "failed to disable logging mode\n");
       // }
-      ROS_FATAL("bCapRobotSlvMove");
+      ROS_FATAL("Failed to call bCapRobotSlvMove: %02x", hr);
       if (hr == BCAP_E_BUF_FULL)
       {
-        ROS_WARN("buffer over flow slvMove %02x", hr);
-      }
-      else
-      {
-        ROS_WARN("failed to send slvMove %02x", hr);
+        ROS_FATAL(" because of buffer overflow");
       }
       finalize();
       cleanupPidFile();
