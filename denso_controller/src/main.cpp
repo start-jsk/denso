@@ -558,9 +558,8 @@ public:
   /**
    * @overridden
    */
-  void initializeHW()
+  void initializeCM()
   {
-
     hw = new pr2_hardware_interface::HardwareInterface();
     hw->addActuator(new pr2_hardware_interface::Actuator("j1_motor"));
     hw->addActuator(new pr2_hardware_interface::Actuator("j2_motor"));
@@ -572,7 +571,13 @@ public:
     //pr2_controller_manager::ControllerManager cm(ec.hw_);
     cm = boost::shared_ptr<pr2_controller_manager::ControllerManager>(
         new pr2_controller_manager::ControllerManager(hw));
+  }
 
+  /**
+   * @overridden
+   */
+  void initializeHW()
+  {
     // for denso connection
     if (!dryrunp)
     {
