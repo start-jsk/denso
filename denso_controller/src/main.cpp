@@ -742,7 +742,6 @@ void quitRequested(int sigint)
   // do nothing
   std::cerr << "quitRequested" << std::endl;
   g_controller.quitRequest();
-  ros::shutdown();
 }
 
 int main(int argc, char *argv[])
