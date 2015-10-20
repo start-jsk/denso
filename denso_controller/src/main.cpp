@@ -673,10 +673,10 @@ public:
         i++;
       }
       setUDPTimeout(0, udp_timeout);
-      sleep(5);
-      for (int j = 0; j < 3; j++) {
-          bCapCurJnt(cur_jnt);
-      }
+      //sleep(5);
+      //for (int j = 0; j < 3; j++) {
+      //    bCapCurJnt(cur_jnt);
+      //}
       // for (int i = 0; i < 5; i++)
       //   bCapRobotSlvMove(&vntPose, &vntResult);
       // hr = bCapRobotSlvMove(&vntPose, &vntResult);
