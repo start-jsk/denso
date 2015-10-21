@@ -486,14 +486,14 @@ public:
       BCAP_HRESULT hr = bCapRobotSlvMove(&vntPose, &vntReturn);
       if (hr == 0xF200501)
       {
-        //ROS_INFO("buf is filled, OK");
+        //ROS_INFO("buf is filled, it's fine.");
       }
       else
       {
         while (hr == 0 && g_halt_requested == false)
-        { // 0 means that there is empty buffer
-          fprintf(stderr, "buf space found, re-send the angles to the controller\n");
-          //ROS_WARN("buf space found, re-send the angles to the controller");
+        {
+          // 0 means that there is an empty buffer
+          ROS_WARN("buf space found, re-send the angles to the controller");
           if (spec_result)
           {
             clock_gettime(CLOCK_REALTIME, spec_result);
@@ -608,14 +608,6 @@ public:
           SAFE_EXIT(1);
         }
       }
-      // sleep(15);
-      // // read joint angles sometimes to skip illegal values
-      std::vector<double> cur_jnt;
-      hr = bCapCurJnt(cur_jnt);
-      // 100 * 50m = 5000
-      // for (int i = 0; i < 5000 / 20; i++) {
-      //   cur_jnt = bCapCurJnt();
-      // }
 
       // enable logging
       {
@@ -646,7 +638,8 @@ public:
         }
       }
 
-      ROS_INFO("bCap connection trial");
+      ROS_INFO("initialize bCap slave connection");
+      std::vector<double> cur_jnt;
       hr = bCapCurJnt(cur_jnt);
       BCAP_VARIANT vntPose, vntResult;
       vntPose.Type = VT_R8 | VT_ARRAY;
@@ -655,13 +648,16 @@ public:
       {
         vntPose.Value.DoubleArray[i] = cur_jnt[i];
       }
-      hr = BCAP_S_OK;
-      while (hr == 0 && g_halt_requested == false)
-      {
-        hr = bCapRobotSlvMove(&vntPose, &vntResult);
-        ROS_INFO("send initialization slvmove");
+      // Fill the buffer for later use, 
+      // unless fill the buffer, bCap slave will fall down 
+      for (int i = 0; i < 4; i++) {
+          hr = bCapRobotSlvMove(&vntPose, &vntResult);
+          if (FAILED(hr)) {
+            ROS_WARN("result is %02x, failed", hr);
+            SAFE_EXIT(1);
+          }
       }
-      ROS_INFO("initialization done");
+      ROS_INFO("bCap slave initialization done");
 
       // fill ac
       int i = 0;
@@ -673,20 +669,6 @@ public:
         i++;
       }
       setUDPTimeout(0, udp_timeout);
-      //sleep(5);
-      //for (int j = 0; j < 3; j++) {
-      //    bCapCurJnt(cur_jnt);
-      //}
-      // for (int i = 0; i < 5; i++)
-      //   bCapRobotSlvMove(&vntPose, &vntResult);
-      // hr = bCapRobotSlvMove(&vntPose, &vntResult);
-      // if (hr == 0) {
-      //   ROS_WARN("buf space found");
-      // }
-      // hr = bCapRobotSlvMove(&vntPose, &vntResult);
-      // if (hr == 0) {
-      //   ROS_WARN("buf space found");
-      // }
     }
   }
 
