@@ -508,7 +508,6 @@ public:
     }
 
     hw->current_time_ = ros::Time::now(); // ???
-    if (!errorp)
     {
       int i = 0;
       for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
@@ -529,7 +528,7 @@ public:
         i++;
       }
     }
-    return !errorp;
+    return true;
   }
 
   void setUDPTimeout(long sec, long usec)
