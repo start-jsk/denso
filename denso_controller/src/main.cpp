@@ -347,7 +347,7 @@ public:
   virtual void finalizeHW()
   {
     ROS_INFO("finalizeHW is called");
-    if (!dryrunp)
+    if (!dryrunp_)
     {
       setUDPTimeout(2, 0);
       sleep(1);
@@ -437,11 +437,11 @@ public:
     vntPose.Arrays = 8;
     {
       int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
       { // *** js and ac must be consistent
-        pr2_mechanism_model::JointState *js = cm->state_->getJointState((*it)->joint_names_[0]);
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
+        pr2_mechanism_model::JointState *js = cm_->state_->getJointState((*it)->joint_names_[0]);
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
         // ROS_INFO("js: %f, ac: %f", js->commanded_effort_, ac->state_.position_);
         double target_angle = RAD2DEG(ac->state_.position_);
         //if (i > 1) {     // moves only the 6-3rd joints
@@ -450,19 +450,19 @@ public:
           target_angle = RAD2DEG(ac->state_.position_ + js->commanded_effort_);
           // check min/max
 #define SAFE_OFFSET_DEG 1
-          if (RAD2DEG(cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower)
+          if (RAD2DEG(cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower)
               + SAFE_OFFSET_DEG > target_angle)
           {
             ROS_WARN("too small joint angle! %f", target_angle);
             target_angle = RAD2DEG(
-                cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower) + SAFE_OFFSET_DEG;
+                cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower) + SAFE_OFFSET_DEG;
           }
-          else if (RAD2DEG(cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper)
+          else if (RAD2DEG(cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper)
               - SAFE_OFFSET_DEG < target_angle)
           {
             ROS_WARN("too large joint angle! %f", target_angle);
             target_angle = RAD2DEG(
-                cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper) - SAFE_OFFSET_DEG;
+                cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper) - SAFE_OFFSET_DEG;
           }
           //ROS_INFO("target_angle: %f", target_angle);
         }
@@ -477,7 +477,7 @@ public:
 
     // send vntPose
     BCAP_VARIANT vntReturn;
-    if (!dryrunp)
+    if (!dryrunp_)
     {
       if (spec_result)
       {
@@ -490,7 +490,7 @@ public:
       }
       else
       {
-        while (hr == 0 && g_halt_requested == false)
+        while (hr == 0 && g_halt_requested_ == false)
         {
           // 0 means that there is an empty buffer
           ROS_WARN("buf space found, re-send the angles to the controller");
@@ -507,16 +507,16 @@ public:
       }
     }
 
-    hw->current_time_ = ros::Time::now(); // ???
+    hw_->current_time_ = ros::Time::now(); // ???
     {
       int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
       { // *** js and ac must be consistent
-        pr2_mechanism_model::JointState *js = cm->state_->getJointState((*it)->joint_names_[0]);
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
+        pr2_mechanism_model::JointState *js = cm_->state_->getJointState((*it)->joint_names_[0]);
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
         ac->state_.velocity_ = 0;
-        if (!dryrunp)
+        if (!dryrunp_)
         { // if not in the dryrun mode, we just copy the vntReturn value
           ac->state_.position_ = DEG2RAD(vntReturn.Value.DoubleArray[i]);
         }
@@ -559,17 +559,17 @@ public:
    */
   void initializeCM()
   {
-    hw = new pr2_hardware_interface::HardwareInterface();
-    hw->addActuator(new pr2_hardware_interface::Actuator("j1_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j2_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j3_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j4_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j5_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("flange_motor"));
+    hw_ = new pr2_hardware_interface::HardwareInterface();
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j1_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j2_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j3_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j4_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j5_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("flange_motor"));
     // // Create controller manager
-    //pr2_controller_manager::ControllerManager cm(ec.hw_);
-    cm = boost::shared_ptr<pr2_controller_manager::ControllerManager>(
-        new pr2_controller_manager::ControllerManager(hw));
+    //pr2_controller_manager::ControllerManager cm_(ec.hw_);
+    cm_ = boost::shared_ptr<pr2_controller_manager::ControllerManager>(
+        new pr2_controller_manager::ControllerManager(hw_));
   }
 
   /**
@@ -578,7 +578,7 @@ public:
   void initializeHW()
   {
     // for denso connection
-    if (!dryrunp)
+    if (!dryrunp_)
     {
       BCAP_HRESULT hr;
       ROS_INFO("bCapOpen");
@@ -660,10 +660,10 @@ public:
 
       // fill ac
       int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
       { // *** js and ac must be consistent
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
         ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
         i++;
       }
