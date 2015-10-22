@@ -93,13 +93,13 @@ public:
     OpenController::start();
   }
 private:
-  char* server_ip_address;
-  int server_port_number;
+  std::string server_ip_address_;
+  int server_port_number_;
   // for bCap parameters
-  int iSockFD;
-  u_int lhController;
-  u_int lhRobot;
-  int udp_timeout;
+  int iSockFD_;
+  u_int lhController_;
+  u_int lhRobot_;
+  int udp_timeout_;
 public:
   /**
    * Open a bCap socket.
@@ -107,7 +107,7 @@ public:
   void bCapOpen()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
-    hr = bCap_Open(server_ip_address, server_port_number, &iSockFD); /* Init socket  */
+    hr = bCap_Open(server_ip_address_.c_str(), server_port_number_, &iSockFD_); /* Init socket  */
     if (FAILED(hr))
     {
       ROS_FATAL("bCap_Open failed\n");
@@ -118,8 +118,8 @@ public:
   void bCapControllerConnect()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
-    hr = bCap_ControllerConnect(iSockFD, (char*)"", (char*)"caoProv.DENSO.VRC", server_ip_address, (char*)"",
-                                &lhController);
+    hr = bCap_ControllerConnect(iSockFD_, (char*)"", (char*)"caoProv.DENSO.VRC", (char*)(server_ip_address_.c_str()), (char*)"",
+                                &lhController_);
     if (FAILED(hr))
     {
       ROS_FATAL("bCap_ControllerConnect failed\n");
@@ -131,7 +131,7 @@ public:
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
-    hr = bCap_ControllerExecute(iSockFD, lhController, (char*)"ClearError", (char*)"", &lResult);
+    hr = bCap_ControllerExecute(iSockFD_, lhController_, (char*)"ClearError", (char*)"", &lResult);
     ROS_INFO("clearError %02x %02x", hr, lResult);
   }
 
@@ -139,7 +139,7 @@ public:
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
-    hr = bCap_ControllerGetRobot(iSockFD, lhController, (char*)"", (char*)"", &lhRobot); /* Get robot handle */
+    hr = bCap_ControllerGetRobot(iSockFD_, lhController_, (char*)"", (char*)"", &lhRobot_); /* Get robot handle */
     ROS_INFO("GetRobot %02x %02x", hr, lhRobot);
     return hr;
   }
@@ -148,7 +148,7 @@ public:
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
-    hr = bCap_RobotExecute(iSockFD, lhRobot, command, arg, &lResult);
+    hr = bCap_RobotExecute(iSockFD_, lhRobot_, command, arg, &lResult);
     return hr;
   }
 
@@ -192,7 +192,7 @@ public:
     BCAP_HRESULT hr = BCAP_E_FAIL;
     while (FAILED(hr))
     {
-      hr = bCap_RobotExecute(iSockFD, lhRobot, "CurJnt", "", &jointvalues[0]);
+      hr = bCap_RobotExecute(iSockFD_, lhRobot_, "CurJnt", "", &jointvalues[0]);
       if (SUCCEEDED(hr))
       {
         break;
@@ -208,7 +208,7 @@ public:
   BCAP_HRESULT bCapSlvChangeMode(char* arg)
   {
     long lResult;
-    BCAP_HRESULT hr = bCap_RobotExecute(iSockFD, lhRobot, "slvChangeMode", arg, &lResult);
+    BCAP_HRESULT hr = bCap_RobotExecute(iSockFD_, lhRobot_, "slvChangeMode", arg, &lResult);
     fprintf(stderr, "slvChangeMode %02x %02x\n", hr, lResult);
     return hr;
   }
@@ -227,7 +227,7 @@ public:
     // struct timeval tv;
     // tv.tv_sec = 0;
     // tv.tv_usec = 1000 * 1;
-    // setsockopt(iSockFD, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    // setsockopt(iSockFD_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     extern int failed_to_send_packet;
     struct timespec tick, before;
     static std::vector<double> prev_angle;
@@ -243,7 +243,7 @@ public:
 
     char* command = (char*)"slvMove";
     clock_gettime(CLOCK_MONOTONIC, &tick);
-    BCAP_HRESULT hr = bCap_RobotExecute2(iSockFD, lhRobot, command, pose, result);
+    BCAP_HRESULT hr = bCap_RobotExecute2(iSockFD_, lhRobot_, command, pose, result);
     clock_gettime(CLOCK_MONOTONIC, &before);
     static const int NSEC_PER_SECOND = 1e+9;
     //static const int USEC_PER_SECOND = 1e6;
@@ -306,7 +306,7 @@ public:
     if (failed_to_send_packet)
     {
       fprintf(stderr, "roundtrip: %f\n", roundtrip);
-      setUDPTimeout(0, udp_timeout);
+      setUDPTimeout(0, udp_timeout_);
 
       // print the angle
       // if (prev_angle.size() > 0) {
@@ -377,7 +377,7 @@ public:
       {
         fprintf(stderr, "successed to motor off\n");
       }
-      hr = bCap_RobotExecute(iSockFD, lhRobot, (char*)"Givearm", (char*)"", &lResult);
+      hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
       if (FAILED(hr))
       {
         fprintf(stderr, "failed to give arm\n");
@@ -386,7 +386,7 @@ public:
       {
         fprintf(stderr, "successed to give arm\n");
       }
-      hr = bCap_RobotRelease(iSockFD, lhRobot); /* Release robot handle */
+      hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
       if (FAILED(hr))
       {
         fprintf(stderr, "failed to release the robot\n");
@@ -395,7 +395,7 @@ public:
       {
         fprintf(stderr, "successed to release the robot\n");
       }
-      hr = bCap_ControllerDisconnect(iSockFD, lhController);
+      hr = bCap_ControllerDisconnect(iSockFD_, lhController_);
       if (FAILED(hr))
       {
         fprintf(stderr, "failed to disconnect from the controller\n");
@@ -405,7 +405,7 @@ public:
         fprintf(stderr, "successed to disconnect from the controller\n");
       }
       /* Stop b-CAP service (Very important in UDP/IP connection) */
-      hr = bCap_ServiceStop(iSockFD);
+      hr = bCap_ServiceStop(iSockFD_);
       if (FAILED(hr))
       {
         fprintf(stderr, "failed to stop the service\n");
@@ -415,7 +415,7 @@ public:
         fprintf(stderr, "successed to stop the service\n");
       }
       sleep(1);
-      hr = bCap_Close(iSockFD);
+      hr = bCap_Close(iSockFD_);
       if (FAILED(hr))
       {
         fprintf(stderr, "failed to close bCap\n");
@@ -537,7 +537,7 @@ public:
     struct timeval tv;
     tv.tv_sec = sec;
     tv.tv_usec = usec;
-    if (setsockopt(iSockFD, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
+    if (setsockopt(iSockFD_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
     {
       perror("Error");
     }
@@ -546,7 +546,7 @@ public:
 
   void bCapServerStart()
   {
-    BCAP_HRESULT hr = bCap_ServiceStart(iSockFD); /* Start b-CAP service */
+    BCAP_HRESULT hr = bCap_ServiceStart(iSockFD_); /* Start b-CAP service */
     if (FAILED(hr))
     {
       ROS_FATAL("bCap_ServiceStart failed\n");
@@ -667,7 +667,7 @@ public:
         ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
         i++;
       }
-      setUDPTimeout(0, udp_timeout);
+      setUDPTimeout(0, udp_timeout_);
     }
   }
 
@@ -677,35 +677,25 @@ public:
     //     moving them to somewhere else might make more sense.
 
     // Determine ip address of the robot's embedded machine.
-    std::string server_ip_address_str;
-    if (!node.getParam("server_ip", server_ip_address_str))
+    if (!node.getParam("server_ip", server_ip_address_))
     {
-      server_ip_address = (char*)DEFAULT_SERVER_IP_ADDRESS;
-    }
-    else
-    {
-      server_ip_address = (char*)malloc(sizeof(char) * (server_ip_address_str.length() + 1));
-      for (size_t i = 0; i < server_ip_address_str.length(); i++)
-      {
-        server_ip_address[i] = server_ip_address_str.at(i);
-      }
-      server_ip_address[server_ip_address_str.length()] = '\0';
+      server_ip_address_ = (char*)DEFAULT_SERVER_IP_ADDRESS;
     }
 
     // Determine the pre-set port number used to communicate the robot's embedded computer via bCap.
-    if (!node.getParam("server_port", server_port_number))
+    if (!node.getParam("server_port", server_port_number_))
     {
-      server_port_number = DEFAULT_SERVER_PORT_NUM;
+      server_port_number_ = DEFAULT_SERVER_PORT_NUM;
     }
 
-    ROS_WARN("server: %s:%d", server_ip_address, server_port_number);
+    ROS_WARN("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
 
     // Determine the pre-set UDP timeout length.
-    if (!node.getParam("udp_timeout", udp_timeout))
+    if (!node.getParam("udp_timeout", udp_timeout_))
     {
-      udp_timeout = DEFAULT_UDP_TIMEOUT;
+      udp_timeout_ = DEFAULT_UDP_TIMEOUT;
     }
-    ROS_WARN("udp_timeout: %d micro sec", udp_timeout);
+    ROS_WARN("udp_timeout: %d micro sec", udp_timeout_);
   }
 
   void quitRequest()
