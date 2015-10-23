@@ -88,6 +88,8 @@ public:
     quitRequest();              \
   }
 
+  virtual ~DensoController(){}
+
   void start()
   {
     OpenController::start();
