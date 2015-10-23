@@ -102,6 +102,10 @@ private:
   u_int lhController_;
   u_int lhRobot_;
   int udp_timeout_;
+  std::vector<double> prev_angle_;
+  std::vector<double> prev_vel_;
+  struct timespec prev_time_;
+
 public:
   /**
    * Open a bCap socket.
@@ -252,30 +256,30 @@ public:
     double roundtrip = (before.tv_sec + double(before.tv_nsec) / NSEC_PER_SECOND)
         - (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND);
 
-    if (prev_angle.size() > 0)
+    if (prev_angle_.size() > 0)
     {
       double tm = (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND)
-          - (prev_time.tv_sec + double(prev_time.tv_nsec) / NSEC_PER_SECOND);
+          - (prev_time_.tv_sec + double(prev_time_.tv_nsec) / NSEC_PER_SECOND);
       current_vel.resize(6);
       for (size_t i = 0; i < 6; i++)
       {
-        current_vel.at(i) = (current_angle[i] - prev_angle[i]) / tm;
+        current_vel.at(i) = (current_angle[i] - prev_angle_[i]) / tm;
       }
     }
-    if (prev_vel.size() > 0)
+    if (prev_vel_.size() > 0)
     {
       double tm = (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND)
-          - (prev_time.tv_sec + double(prev_time.tv_nsec) / NSEC_PER_SECOND);
+          - (prev_time_.tv_sec + double(prev_time_.tv_nsec) / NSEC_PER_SECOND);
       current_acc.resize(6);
       for (size_t i = 0; i < 6; i++)
       {
-        current_acc.at(i) = (current_vel[i] - prev_vel[i]) / tm;
+        current_acc.at(i) = (current_vel[i] - prev_vel_[i]) / tm;
       }
     }
 
-    prev_time = tick;
-    ROS_INFO("current angle: %f %f %f %f %f %f", current_angle[0], current_angle[1], current_angle[2], current_angle[3],
-             current_angle[4], current_angle[5]);
+    prev_time_ = tick;
+    //ROS_INFO("current angle: %f %f %f %f %f %f", current_angle[0], current_angle[1], current_angle[2], current_angle[3],
+             //current_angle[4], current_angle[5]);
 
     // if (current_vel.size() > 0) {
     //   ROS_INFO("current vel: %f %f %f %f %f %f",
@@ -286,14 +290,14 @@ public:
     //            current_vel[4],
     //            current_vel[5]);
     //   }
-    //   if (prev_vel.size() > 0) {
+    //   if (prev_vel_.size() > 0) {
     //     ROS_INFO("prev vel: %f %f %f %f %f %f",
-    //            prev_vel[0],
-    //            prev_vel[1],
-    //            prev_vel[2],
-    //            prev_vel[3],
-    //            prev_vel[4],
-    //            prev_vel[5]);
+    //            prev_vel_[0],
+    //            prev_vel_[1],
+    //            prev_vel_[2],
+    //            prev_vel_[3],
+    //            prev_vel_[4],
+    //            prev_vel_[5]);
     //   }
     // if (current_acc.size() > 0) {
     //     ROS_INFO("current acc: %f %f %f %f %f %f",
@@ -311,14 +315,14 @@ public:
       setUDPTimeout(0, udp_timeout_);
 
       // print the angle
-      // if (prev_angle.size() > 0) {
+      // if (prev_angle_.size() > 0) {
       //   ROS_INFO("prev angle: %f %f %f %f %f %f",
-      //            prev_angle[0],
-      //            prev_angle[1],
-      //            prev_angle[2],
-      //            prev_angle[3],
-      //            prev_angle[4],
-      //            prev_angle[5]);
+      //            prev_angle_[0],
+      //            prev_angle_[1],
+      //            prev_angle_[2],
+      //            prev_angle_[3],
+      //            prev_angle_[4],
+      //            prev_angle_[5]);
       // }
       // ROS_INFO("current angle: %f %f %f %f %f %f",
       //          current_angle[0],
@@ -341,8 +345,8 @@ public:
     }
 
     // memoize prev angle
-    prev_angle = current_angle;
-    prev_vel = current_vel;
+    prev_angle_ = current_angle;
+    prev_vel_ = current_vel;
     return hr;
   }
 
