@@ -358,7 +358,8 @@ public:
       hr = bCapSlvChangeMode((char*)"0");
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to change slave mode\n");
+        ROS_WARN("failed to change slave mode");
+        SAFE_EXIT(1);
       }
 
       // disable logging mode
@@ -371,61 +372,61 @@ public:
       hr = bCapMotor(false);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to motor off\n");
+        ROS_WARN("failed to motor off");
       }
       else
       {
-        fprintf(stderr, "successed to motor off\n");
+        ROS_INFO("successed to motor off");
       }
       hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to give arm\n");
+        ROS_WARN("failed to give arm");
       }
       else
       {
-        fprintf(stderr, "successed to give arm\n");
+        ROS_INFO("successed to give arm");
       }
       hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to release the robot\n");
+        ROS_WARN("failed to release the robot");
       }
       else
       {
-        fprintf(stderr, "successed to release the robot\n");
+        ROS_INFO( "successed to release the robot");
       }
       hr = bCap_ControllerDisconnect(iSockFD_, lhController_);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to disconnect from the controller\n");
+        ROS_WARN("failed to disconnect from the controller");
       }
       else
       {
-        fprintf(stderr, "successed to disconnect from the controller\n");
+        ROS_INFO("successed to disconnect from the controller");
       }
       /* Stop b-CAP service (Very important in UDP/IP connection) */
       hr = bCap_ServiceStop(iSockFD_);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to stop the service\n");
+        ROS_WARN("failed to stop the service");
       }
       else
       {
-        fprintf(stderr, "successed to stop the service\n");
+        ROS_INFO("successed to stop the service");
       }
       sleep(1);
       hr = bCap_Close(iSockFD_);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to close bCap\n");
+        ROS_WARN("failed to close bCap");
       }
       else
       {
-        fprintf(stderr, "successed to close bCap\n");
+        ROS_INFO("successed to close bCap");
       }
     }
-    fprintf(stderr, "finalizing done\n");
+    ROS_INFO("finalizing finished");
   }
 
   bool updateJoints(struct timespec* spec_result)
