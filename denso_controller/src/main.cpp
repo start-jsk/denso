@@ -335,9 +335,6 @@ public:
     // setsockopt(iSockFD_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     extern int failed_to_send_packet;
     struct timespec tick, before;
-    static std::vector<double> prev_angle;
-    static std::vector<double> prev_vel;
-    static struct timespec prev_time;
     std::vector<double> current_angle;
     std::vector<double> current_vel;
     std::vector<double> current_acc;
