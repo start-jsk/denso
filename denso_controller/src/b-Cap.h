@@ -13,6 +13,7 @@
  This is a sample source code. Copy and modify this code in accordance with a device and a device version. Especially please note timeout and timeout-retry settings.
 */
 
+#pragma pack(push,1) // for BCAP_VARIANT members alignment
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -165,3 +166,5 @@ BCAP_HRESULT	bCap_VariablePutValue(int iSockFd, u_int lhVar, u_short iType, u_in
 #ifdef __cplusplus
 }
 #endif
+
+#pragma pack(pop)
