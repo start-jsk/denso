@@ -57,6 +57,7 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/pointer_cast.hpp>
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
 #include <pr2_controller_manager/controller_manager.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
@@ -80,6 +81,19 @@
 
 class DensoController : public OpenControllersInterface::OpenController
 {
+  class DensoControllerStatus : public OpenControllersInterface::ControllerStatus {
+    public:
+      DensoControllerStatus(BCAP_HRESULT hr): hr_(hr){};
+      DensoControllerStatus(u_int error_code): hr_((BCAP_HRESULT)error_code){};
+      virtual ~DensoControllerStatus(){};
+      virtual bool isHealthy(){
+          return SUCCEEDED(hr_);
+      }
+      BCAP_HRESULT hr_;
+  };
+  typedef boost::shared_ptr<DensoControllerStatus> DensoControllerStatusPtr;
+  //#define CAST_STATUS(error_code) boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(error_code)))
+
 public:
   DensoController() :
       OpenControllersInterface::OpenController()
@@ -526,9 +540,8 @@ public:
     ROS_INFO("finalizing finished");
   }
 
-  bool updateJoints(struct timespec* spec_result)
+  OpenControllersInterface::ControllerStatusPtr updateJoints(struct timespec* spec_result)
   {
-    
     // build vntPose
     BCAP_VARIANT vntPose;
     vntPose.Type = VT_R8 | VT_ARRAY;
@@ -542,7 +555,6 @@ public:
         pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
         // ROS_INFO("js: %f, ac: %f", js->commanded_effort_, ac->state_.position_);
         double target_angle = RAD2DEG(ac->state_.position_);
-        //if (i > 1) {     // moves only the 6-3rd joints
         if (true)
         {
           target_angle = RAD2DEG(ac->state_.position_ + js->commanded_effort_);
@@ -572,8 +584,10 @@ public:
         i++;
       }
     }
-
+    //ROS_INFO("target angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
+          
     // send vntPose
+    DensoControllerStatusPtr status;
     BCAP_VARIANT vntReturn;
     if (!dryrunp_)
     {
@@ -585,23 +599,29 @@ public:
       if (hr == 0xF200501)
       {
         //ROS_INFO("buf is filled, it's fine.");
+        status.reset(new DensoControllerStatus(BCAP_S_OK));
+      }
+      else if (FAILED(hr))
+      {
+        status.reset(new DensoControllerStatus(hr));
       }
       else
       {
-        while (hr == 0 && g_halt_requested_ == false)
-        {
-          // 0 means that there is an empty buffer
-          ROS_WARN("buf space found, re-send the angles to the controller");
-          if (spec_result)
-          {
-            clock_gettime(CLOCK_REALTIME, spec_result);
-          }
-          hr = bCapRobotSlvMove(&vntPose, &vntReturn);
-          if (hr == 0xF200501)
-          {
-            ROS_WARN("buf is filled");
-          }
-        }
+        status.reset(new DensoControllerStatus(BCAP_S_OK));
+        //while (hr == 0 && g_halt_requested_ == false)
+        //{
+        //  // 0 means that there is an empty buffer
+        //  ROS_WARN("buf space found, re-send the angles to the controller");
+        //  if (spec_result)
+        //  {
+        //    clock_gettime(CLOCK_REALTIME, spec_result);
+        //  }
+        //  hr = bCapRobotSlvMove(&vntPose, &vntReturn);
+        //  if (hr == 0xF200501)
+        //  {
+        //    ROS_WARN("buf is filled");
+        //  }
+        //}
       }
     }
 
@@ -626,9 +646,58 @@ public:
         i++;
       }
     }
-    return true;
+    return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(status);
   }
 
+
+  OpenControllersInterface::ControllerStatusPtr recoverController()
+  {
+    ROS_WARN("try to recover controller...");
+    u_int errorcode;
+    std::string errormsg;
+
+    errorcode = bCapGetErrorCode();
+    bCapErrorDescription(errormsg);
+    
+    ROS_INFO("errormsg: %s", errormsg.c_str());
+
+    if (errorcode == BCAP_E_UNEXPECTED)
+    {
+      ROS_FATAL("Unexpected Error occured. no way to recover!");
+      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(errorcode)));
+    }
+
+    if (errorcode >= 0x83204231 && errorcode <= 0x83204238)
+    {
+      ROS_INFO("joint angle is over the software limit.");
+      ROS_INFO("currently, there is no way to recover, quit.");
+      // TODO publish message and return healthy status.
+      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+    }
+    if (errorcode == 0x83500121)
+    {
+      ROS_INFO("robot is not in slavemode, try to change");
+      BCAP_HRESULT hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+    }
+    if (errorcode == 0x83501032)
+    {
+      //TODO rethink the way to recover
+      ROS_INFO("invalid command when the robot is in slave mode, disable slave mode");
+      BCAP_HRESULT hr = bCapSlvChangeMode((char*)"0"); // 0x202
+      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+    }
+
+    if (errorcode == 0x81501025)
+    {
+      ROS_INFO("do not send message while an error is occuring");
+      BCAP_HRESULT hr = bCapClearError();
+      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+    }
+
+    return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_S_OK)));
+  }
+ 
   void setUDPTimeout(long sec, long usec)
   {
 #ifdef BCAP_CONNECTION_UDP
