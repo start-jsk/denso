@@ -634,9 +634,13 @@ public:
     struct timeval tv;
     tv.tv_sec = sec;
     tv.tv_usec = usec;
+    if (setsockopt(iSockFD_, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0)
+    {
+      ROS_WARN("Failed to set send timeout");
+    }
     if (setsockopt(iSockFD_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
     {
-      perror("Error");
+      ROS_WARN("Failed to set recv timeout");
     }
 #endif
   }
@@ -681,7 +685,7 @@ public:
       ROS_INFO("bCapOpen");
       bCapOpen();
       ROS_INFO("bCapServerStart");
-      setUDPTimeout(2, 0); // 200msec
+      setUDPTimeout(2, 0); // 2000msec
       bCapServerStart();
       ROS_INFO("bCapControllerConnect");
       bCapControllerConnect();
@@ -772,7 +776,7 @@ public:
         ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
         i++;
       }
-      setUDPTimeout(0, udp_timeout_);
+      setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
     }
   }
 
