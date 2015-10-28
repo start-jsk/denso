@@ -122,7 +122,7 @@ public:
     if (FAILED(hr))
     {
       ROS_FATAL("bCap_Open failed\n");
-      exit(1);
+      SAFE_EXIT(1);
     }
   }
 
@@ -138,12 +138,13 @@ public:
     }
   }
 
-  void bCapClearError()
+  BCAP_HRESULT bCapClearError()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
     hr = bCap_ControllerExecute(iSockFD_, lhController_, (char*)"ClearError", (char*)"", &lResult);
     ROS_INFO("clearError %02x %02x", hr, lResult);
+    return hr;
   }
 
   BCAP_HRESULT bCapGetRobot()
@@ -151,7 +152,7 @@ public:
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
     hr = bCap_ControllerGetRobot(iSockFD_, lhController_, (char*)"", (char*)"", &lhRobot_); /* Get robot handle */
-    ROS_INFO("GetRobot %02x %02x", hr, lhRobot);
+    ROS_INFO("GetRobot %02x %02x", hr, lhRobot_);
     return hr;
   }
 
@@ -306,18 +307,7 @@ public:
   {
     jointvalues.resize(8);
     BCAP_HRESULT hr = BCAP_E_FAIL;
-    while (FAILED(hr))
-    {
-      hr = bCap_RobotExecute(iSockFD_, lhRobot_, "CurJnt", "", &jointvalues[0]);
-      if (SUCCEEDED(hr))
-      {
-        break;
-      }
-      else
-      {
-        fprintf(stderr, "failed to read joint angles, retry\n");
-      }
-    }
+    hr = bCap_RobotExecute(iSockFD_, lhRobot_, "CurJnt", "", &jointvalues[0]);
     return hr;
   }
 
@@ -325,13 +315,12 @@ public:
   {
     long lResult;
     BCAP_HRESULT hr = bCap_RobotExecute(iSockFD_, lhRobot_, "slvChangeMode", arg, &lResult);
-    fprintf(stderr, "slvChangeMode %02x %02x\n", hr, lResult);
+    ROS_INFO("change slave mode: hr: %02x, result: %02x", hr, lResult);
     return hr;
   }
 
   BCAP_HRESULT bCapRobotSlvMove(BCAP_VARIANT* pose, BCAP_VARIANT* result)
   {
-    //ROS_INFO("bCapRobotSlvMove");
     // ROS_INFO("sending angle: %f %f %f %f %f %f",
     //          pose->Value.DoubleArray[0],
     //          pose->Value.DoubleArray[1],
@@ -360,6 +349,11 @@ public:
     char* command = (char*)"slvMove";
     clock_gettime(CLOCK_MONOTONIC, &tick);
     BCAP_HRESULT hr = bCap_RobotExecute2(iSockFD_, lhRobot_, command, pose, result);
+
+    if (FAILED(hr)) {
+      ROS_WARN("failed to slvmove, errorcode: %02x", hr);
+    }
+
     clock_gettime(CLOCK_MONOTONIC, &before);
     static const int NSEC_PER_SECOND = 1e+9;
     //static const int USEC_PER_SECOND = 1e6;
@@ -422,7 +416,7 @@ public:
     if (failed_to_send_packet)
     {
       fprintf(stderr, "roundtrip: %f\n", roundtrip);
-      setUDPTimeout(0, udp_timeout_);
+      setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
 
       // print the angle
       // if (prev_angle_.size() > 0) {
@@ -866,20 +860,19 @@ int main(int argc, char *argv[])
   g_controller.initialize();
   boost::thread t(&DensoController::start, &g_controller);
   {
-    //OpenControllersInterface::Finalizer finalizer(&g_controller);
+    OpenControllersInterface::Finalizer finalizer(&g_controller);
     ros::Rate loop_rate(100);
     while (ros::ok())
     {
       ros::spinOnce();
       loop_rate.sleep();
     }
-    fprintf(stderr, "ROS has been terminated\n");
+    ROS_WARN("ROS has been terminated");
     t.join();
-    fprintf(stderr, "start thread has been terminated\n");
-    g_controller.finalize();
+    ROS_WARN("start thread has been terminated");
   }
 
   g_controller.cleanupPidFile();
-  return rv;
+  return 0;
 }
 
