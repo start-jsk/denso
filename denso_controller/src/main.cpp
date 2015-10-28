@@ -436,17 +436,6 @@ public:
       //          current_angle[4],
       //          current_angle[5]);
     }
-    if (FAILED(hr))
-    {
-      ROS_FATAL("Failed to call bCapRobotSlvMove: %02x", hr);
-      if (hr == BCAP_E_BUF_FULL)
-      {
-        ROS_FATAL(" because of buffer overflow");
-      }
-      finalize();
-      cleanupPidFile();
-      kill(getpid(), SIGKILL);
-    }
 
     // memoize prev angle
     prev_angle_ = current_angle;
