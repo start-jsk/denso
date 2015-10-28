@@ -276,6 +276,23 @@ public:
     return 0;
   }
 
+  // 1: manual, 2: teachcheck, 3:auto
+  u_int bCapGetMode()
+  {
+    //u_int errorcode = 0; // this local variable is not allocated in debug mode...? why...
+    u_int mode = 0;
+    if( var_types_.find("MODE") != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["MODE"], &mode);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get MODE, return 0 instead.");
+        return 0;
+      }
+      return mode;
+    }
+    ROS_WARN("No handler for MODE, return 0 instead.");
+    return 0;
+  }
+
   u_int bCapErrorDescription(std::string& errormsg)
   {
     if( var_types_.find("ERROR_DESCRIPTION") != var_types_.end() ) {
@@ -671,12 +688,37 @@ public:
     {
       ROS_INFO("joint angle is over the software limit.");
       ROS_INFO("currently, there is no way to recover, quit.");
-      // TODO publish message and return healthy status.
+      // TODO publish message and return healthy status so that an application can send recovery-trajectory.
       return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+    }
+
+    if (errorcode == 0x83204231)
+    {
+      ROS_INFO("invalid command was sent and stop everything, needs to restart everything");
+      //TODO
+      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+    }
+
+    if (errorcode == 0x84201486)
+    {
+        u_int mode;
+        while(!g_quit_)
+        {
+            mode = bCapGetMode();
+            if (mode != 3) {
+              // user set controller to manual or teachcheck mode, wait until the user set back to auto
+              ROS_WARN("waiting until you set back to auto");
+              sleep(2);
+            } else {
+              //TODO restart bcap server
+              break;
+            }
+        }
+        return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
     }
     if (errorcode == 0x83500121)
     {
-      ROS_INFO("robot is not in slavemode, try to change");
+      ROS_INFO("robot is not in slavemode, try to change, ");
       BCAP_HRESULT hr = bCapSlvChangeMode((char*)"514"); // 0x202
       return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
     }
