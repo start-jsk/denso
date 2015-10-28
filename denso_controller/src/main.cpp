@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <map>
 #include "ros/ros.h"
 #include <execinfo.h>
 #include <signal.h>
@@ -102,6 +103,10 @@ private:
   u_int lhController_;
   u_int lhRobot_;
   int udp_timeout_;
+  std::map<std::string, u_int>   var_handlers_;
+  std::map<std::string, u_short> var_types_;
+  char errdesc_buffer_[2048]; // TODO: is this enough?
+
   std::vector<double> prev_angle_;
   std::vector<double> prev_vel_;
   struct timespec prev_time_;
@@ -177,6 +182,111 @@ public:
       exit(1);
     }
   }
+
+  void bCapInitializeVariableHandlers()
+  {
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("MODE",bCapControllerGetVariable("@MODE")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("ERROR_CODE",bCapControllerGetVariable("@ERROR_CODE")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("ERROR_DESCRIPTION",bCapControllerGetVariable("@ERROR_DESCRIPTION")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("VERSION",bCapControllerGetVariable("@VERSION")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("SPEED",bCapRobotGetVariable("@SPEED")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("ACCEL",bCapRobotGetVariable("@ACCEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("DECEL",bCapRobotGetVariable("@DECEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("JSPEED",bCapRobotGetVariable("@JSPEED")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("JACCEL",bCapRobotGetVariable("@JACCEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("JDECEL",bCapRobotGetVariable("@JDECEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EXTSPEED",bCapRobotGetVariable("@EXTSPEED")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EXTACCEL",bCapRobotGetVariable("@EXTACCEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EXTDECEL",bCapRobotGetVariable("@EXTDECEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("SERVO_ON",bCapRobotGetVariable("@SERVO_ON")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("BUSY_STATUS",bCapControllerGetVariable("@BUSY_STATUS")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("CURRENT_TIME",bCapControllerGetVariable("@CURRENT_TIME")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("LOCK",bCapControllerGetVariable("@LOCK")));
+
+    var_types_.insert(std::map<std::string, u_short>::value_type("ERROR_CODE", VT_I4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("MODE", VT_I4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("ERROR_DESCRIPTION", VT_BSTR));
+    var_types_.insert(std::map<std::string, u_short>::value_type("VERSION", VT_BSTR));
+    var_types_.insert(std::map<std::string, u_short>::value_type("SPEED", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("ACCEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("DECEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("JSPEED", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("JACCEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("JDECEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EXTSPEED", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EXTACCEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EXTDECEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("BUSY_STATUS", VT_BOOL));
+    var_types_.insert(std::map<std::string, u_short>::value_type("CURRENT_TIME", VT_DATE));
+    var_types_.insert(std::map<std::string, u_short>::value_type("LOCK", VT_BOOL));
+  }
+
+  u_int bCapControllerGetVariable(const std::string& varname)
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    u_int varresult;
+    hr = bCap_ControllerGetVariable(iSockFD_, lhController_, (char*)(varname.c_str()), (char*)"", &varresult);
+    if(FAILED(hr)) {
+        ROS_WARN("failed to controller get variable '%s' hr:%02x result:%02x", varname.c_str(), hr, varresult);
+    }
+    return varresult;
+  }
+
+  u_int bCapRobotGetVariable(const std::string& varname)
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    u_int varresult;
+    hr = bCap_RobotGetVariable(iSockFD_, lhRobot_, (char*)(varname.c_str()), (char*)"", &varresult);
+    if(FAILED(hr)) {
+        ROS_WARN("failed to controller get variable '%s' hr:%02x result:%02x", varname.c_str(), hr, varresult);
+    }
+    return varresult;
+  }
+
+  u_int __errorcode__;
+  u_int bCapGetErrorCode()
+  {
+    //u_int errorcode = 0; // this local variable is not allocated in debug mode...? why...
+    __errorcode__ = 0;
+    if( var_types_.find("ERROR_CODE") != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["ERROR_CODE"], &__errorcode__);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get ERROR_CODE, return %02x instead.", hr);
+        return hr;
+      }
+      return __errorcode__;
+    }
+    ROS_WARN("ERROR_CODE is not in variable handlers");
+    return 0;
+  }
+
+  u_int bCapErrorDescription(std::string& errormsg)
+  {
+    if( var_types_.find("ERROR_DESCRIPTION") != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["ERROR_DESCRIPTION"], errdesc_buffer_);
+      errormsg = errdesc_buffer_; //copy
+
+      // find null
+      size_t strlen = 0;
+      while(strlen<2000) {
+        if( *((uint16_t*)errdesc_buffer_+strlen) == 0 ) {
+          break;
+        }
+        ++strlen;
+      }
+
+      ROS_INFO("raw error description: %s", errdesc_buffer_);
+      try {
+          utf8::utf16to8((uint16_t*)errdesc_buffer_, (uint16_t*)errdesc_buffer_+strlen, std::back_inserter(errormsg));
+      } catch (utf8::invalid_utf16& e) {
+          errormsg = errdesc_buffer_; //copy
+      }
+      return hr;
+    }
+    ROS_WARN("ERROR_DESCRIPTION is not in variable handlers");
+    return 0;
+  }
+
 
   BCAP_HRESULT bCapMotor(bool command)
   {
@@ -604,12 +714,20 @@ public:
       ROS_INFO("bCapSetExternalSpeed");
       bCapSetExternalSpeed((char*)"80.0");
 
+      bCapInitializeVariableHandlers();
+
       {
         ROS_WARN("bCapMotor On");
         hr = bCapMotor(true);
         if (FAILED(hr))
         {
-          ROS_FATAL("failed to motor on");
+          u_int errorcode;
+          std::string errormsg;
+          errorcode = bCapGetErrorCode();
+          bCapErrorDescription(errormsg);
+          ROS_INFO("errormsg: %s", errormsg.c_str());
+          ROS_WARN("failed to motor on, errorcode: %02x, errormsg: %s", errorcode, errormsg.c_str());
+          //ROS_FATAL("failed to motor on");
           finalize();
           SAFE_EXIT(1);
         }
