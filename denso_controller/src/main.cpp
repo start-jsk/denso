@@ -92,7 +92,6 @@ class DensoController : public OpenControllersInterface::OpenController
       BCAP_HRESULT hr_;
   };
   typedef boost::shared_ptr<DensoControllerStatus> DensoControllerStatusPtr;
-  //#define CAST_STATUS(error_code) boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(error_code)))
 
 public:
   DensoController() :
@@ -678,7 +677,7 @@ public:
     if (errorcode == BCAP_E_UNEXPECTED)
     {
       ROS_FATAL("Unexpected Error occured. no way to recover!");
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(errorcode)));
+      return CAST_STATUS(errorcode);
     }
 
     if (errorcode >= 0x83204071 && errorcode <= 0x83204078)
@@ -686,14 +685,14 @@ public:
       ROS_INFO("joint angle is over the software limit.");
       ROS_INFO("currently, there is no way to recover, quit.");
       // TODO publish message and return healthy status so that an application can send recovery-trajectory.
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+      return CAST_STATUS(BCAP_E_FAIL);
     }
     if (errorcode >= 0x84204081 && errorcode <= 0x842040A8)
     {
       ROS_INFO("joint angle velocity is over the software limit.");
       ROS_INFO("currently, there is no way to recover, quit.");
       // TODO publish message and return healthy status so that an application can send recovery-trajectory.
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+      return CAST_STATUS(BCAP_E_FAIL);
     }
     if (errorcode >= 0x84204051 && errorcode <= 0x84204058)
     {
@@ -724,7 +723,7 @@ public:
       ROS_INFO("joint angle acceleration is over the software limit.");
       ROS_INFO("currently, there is no way to recover, quit.");
       // TODO publish message and return healthy status so that an application can send recovery-trajectory.
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+      return CAST_STATUS(BCAP_E_FAIL);
     }
 
 
@@ -732,14 +731,14 @@ public:
     {
       ROS_INFO("invalid command was sent and everything stopped, needs to restart everything");
       //TODO restart everything
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+      return CAST_STATUS(BCAP_E_FAIL);
     }
 
     if (errorcode == 0x81501003)
     {
       ROS_INFO("motor is off, turn on");
       BCAP_HRESULT hr = bCapMotor(true);
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+      return CAST_STATUS(hr);
     }
 
     if (errorcode == 0x84201486)
@@ -795,34 +794,34 @@ public:
       ROS_INFO("robot is not in slavemode, try to change it");
       BCAP_HRESULT hr;
       hr = bCapClearError();
-      if (FAILED(hr)) return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+      if (FAILED(hr)) return CAST_STATUS(hr);
       hr = bCapMotor(true);
       if (FAILED(hr)) {
         ROS_WARN("failed to turn on motor, cannot recover");
-        return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+        return CAST_STATUS(hr);
       }
       hr = bCapSlvChangeMode((char*)"514"); // 0x202
       if (FAILED(hr)) {
         ROS_WARN("failed to change slvmode, cannot recover");
       }
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+      return CAST_STATUS(hr);
     }
     if (errorcode == 0x83501032)
     {
       //TODO rethink the way to recover
       ROS_INFO("invalid command when the robot is in slave mode, disable slave mode");
       BCAP_HRESULT hr = bCapSlvChangeMode((char*)"0"); // 0x202
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+      return CAST_STATUS(hr);
     }
 
     if (errorcode == 0x81501025)
     {
       ROS_INFO("do not send message while an error is occuring");
       BCAP_HRESULT hr = bCapClearError();
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)));
+      return CAST_STATUS(hr);
     }
 
-    return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_S_OK)));
+    return CAST_STATUS(BCAP_S_OK);
 #undef CAST_STATUS(hr)
   }
  
