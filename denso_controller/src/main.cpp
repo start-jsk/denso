@@ -596,7 +596,16 @@ public:
       {
         clock_gettime(CLOCK_REALTIME, spec_result);
       }
+      // check bcap status beforehand
+      u_int errorcode;
+      errorcode = bCapGetErrorCode();
+      if (FAILED(errorcode)) {
+        ROS_WARN("bad status! robot needs recovery! hr: %02x", errorcode);
+        status.reset(new DensoControllerStatus(errorcode));
+        return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(status);
+      }
       BCAP_HRESULT hr = bCapRobotSlvMove(&vntPose, &vntReturn);
+      ROS_DEBUG("updateJoints hr: %02x", hr);
       if (hr == 0xF200501)
       {
         //ROS_INFO("buf is filled, it's fine.");
