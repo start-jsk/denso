@@ -1,19 +1,27 @@
-language:
-  - cpp
-  - python
-python:
-  - "2.7"
+#   Original Author: William Woodall, Mani Monajjemi
+
+sudo: required
+dist: trusty
+# Force travis to use its minimal image with default Python settings
+language: generic
 compiler:
   - gcc
 env:
-  #- ROS_DISTRO=groovy ROSWS=wstool BUILDER=catkin    USE_DEB=true
-  #- ROS_DISTRO=groovy ROSWS=wstool BUILDER=catkin    USE_DEB=false
-  - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin    USE_DEB=true
-  - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin    USE_DEB=false
-  - ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=true
-  - ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=false
-matrix:
-  allow_failures:
-    - env: ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=true
-    - env: ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=false
+  global:
+    - CATKIN_WS=~/catkin_ws
+    - CATKIN_WS_SRC=${CATKIN_WS}/src
+    - ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=true
+    - ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=false
+  matrix:
+    - CI_ROS_DISTRO="indigo"
+    #- CI_ROS_DISTRO="jade"
+    allow_failures:
+      - env: ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=true
+      - env: ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=false
+notifications:
+  email:
+    recipients:
+      - dev@opensource-robotics.tokyo.jp
+    on_success: always #[always|never|change] # default: change
+    on_failure: always #[always|never|change] # default: always
 script: source .travis/travis.sh
