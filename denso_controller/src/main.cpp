@@ -130,27 +130,19 @@ public:
   /**
    * Open a bCap socket.
    */
-  void bCapOpen()
+  BCAP_HRESULT bCapOpen()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     hr = bCap_Open(server_ip_address_.c_str(), server_port_number_, &iSockFD_); /* Init socket  */
-    if (FAILED(hr))
-    {
-      ROS_FATAL("bCap_Open failed\n");
-      SAFE_EXIT(1);
-    }
+    return hr;
   }
 
-  void bCapControllerConnect()
+  BCAP_HRESULT bCapControllerConnect()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     hr = bCap_ControllerConnect(iSockFD_, (char*)"", (char*)"caoProv.DENSO.VRC", (char*)(server_ip_address_.c_str()), (char*)"",
                                 &lhController_);
-    if (FAILED(hr))
-    {
-      ROS_FATAL("bCap_ControllerConnect failed\n");
-      exit(1);
-    }
+    return hr;
   }
 
   BCAP_HRESULT bCapClearError()
@@ -179,24 +171,16 @@ public:
     return hr;
   }
 
-  void bCapTakearm()
+  BCAP_HRESULT bCapTakearm()
   {
     BCAP_HRESULT hr = bCapRobotExecute("Takearm", "");
-    if (FAILED(hr))
-    {
-      ROS_FATAL("failed to takearm");
-      exit(1);
-    }
+    return hr;
   }
 
-  void bCapSetExternalSpeed(char* arg)
+  BCAP_HRESULT bCapSetExternalSpeed(char* arg)
   {
     BCAP_HRESULT hr = bCapRobotExecute("ExtSpeed", arg);
-    if (FAILED(hr))
-    {
-      ROS_FATAL("failed to bCapSetExternalSpeed");
-      exit(1);
-    }
+    return hr;
   }
 
   void bCapInitializeVariableHandlers()
@@ -757,14 +741,10 @@ public:
 #endif
   }
 
-  void bCapServerStart()
+  BCAP_HRESULT bCapServerStart()
   {
     BCAP_HRESULT hr = bCap_ServiceStart(iSockFD_); /* Start b-CAP service */
-    if (FAILED(hr))
-    {
-      ROS_FATAL("bCap_ServiceStart failed\n");
-      SAFE_EXIT(1);
-    }
+    return hr;
   }
 
   /**
@@ -795,20 +775,27 @@ public:
     {
       BCAP_HRESULT hr;
       ROS_INFO("bCapOpen");
-      bCapOpen();
-      ROS_INFO("bCapServerStart");
+      hr = bCapOpen();
+      if(FAILED(hr)) exit(1);
       setUDPTimeout(2, 0); // 2000msec
-      bCapServerStart();
+      ROS_INFO("bCapServerStart");
+      hr = bCapServerStart();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapControllerConnect");
-      bCapControllerConnect();
+      hr = bCapControllerConnect();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapClearError");
-      bCapClearError();
+      hr = bCapClearError();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapGetRobot");
-      bCapGetRobot();
+      hr = bCapGetRobot();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapTakearm");
-      bCapTakearm();
+      hr = bCapTakearm();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapSetExternalSpeed");
-      bCapSetExternalSpeed((char*)"80.0");
+      hr = bCapSetExternalSpeed((char*)"100.0");
+      if(FAILED(hr)) exit(1);
 
       bCapInitializeVariableHandlers();
 
