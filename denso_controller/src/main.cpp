@@ -585,7 +585,7 @@ public:
         i++;
       }
     }
-    //ROS_INFO("target angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
+    ROS_DEBUG("target angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
           
     // send vntPose
     DensoControllerStatusPtr status;
@@ -626,6 +626,7 @@ public:
       }
     }
 
+    ROS_DEBUG("current angles(response): %f %f %f %f %f %f", vntReturn.Value.DoubleArray[0], vntReturn.Value.DoubleArray[1], vntReturn.Value.DoubleArray[2], vntReturn.Value.DoubleArray[3], vntReturn.Value.DoubleArray[4], vntReturn.Value.DoubleArray[5]);
     hw_->current_time_ = ros::Time::now(); // ???
     {
       int i = 0;
