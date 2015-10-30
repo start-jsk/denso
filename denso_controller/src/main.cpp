@@ -701,7 +701,13 @@ public:
       //ROS_INFO("currently, there is no way to recover, quit.");
       //return CAST_STATUS(BCAP_E_FAIL);
       // TODO publish message and return healthy status so that an application can send recovery-trajectory.
-      BCAP_HRESULT hr = bCapMotor(true);
+      BCAP_HRESULT hr;
+      hr = bCapClearError();
+      if (FAILED(hr)) {
+          ROS_WARN("failed to clear error %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      hr = bCapMotor(true);
       if (FAILED(hr)) {
           ROS_WARN("failed to turn on motor %02x", hr);
           return CAST_STATUS(hr);
