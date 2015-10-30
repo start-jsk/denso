@@ -2,6 +2,10 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update to indigo
+
 0.2.9 (2015-03-07)
 ------------------
 

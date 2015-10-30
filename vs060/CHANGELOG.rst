@@ -2,6 +2,14 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update to indigo
+* Use arg for world file name
+* [vs060] use stl file instead of dae file in order to work on gazebo
+* Add launch file for Gazebo
+* Contributors: Isaac IY Saito, Ryohei Ueda, Hisashi Kanda
+
 0.2.9 (2015-03-07)
 ------------------
 
