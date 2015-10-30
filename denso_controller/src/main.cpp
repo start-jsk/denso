@@ -698,9 +698,20 @@ public:
     if (errorcode >= 0x84204051 && errorcode <= 0x84204058)
     {
       ROS_INFO("joint angle velocity(sent) is over the software limit.");
-      ROS_INFO("currently, there is no way to recover, quit.");
+      //ROS_INFO("currently, there is no way to recover, quit.");
+      //return CAST_STATUS(BCAP_E_FAIL);
       // TODO publish message and return healthy status so that an application can send recovery-trajectory.
-      return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(BCAP_E_FAIL)));
+      BCAP_HRESULT hr = bCapMotor(true);
+      if (FAILED(hr)) {
+          ROS_WARN("failed to turn on motor %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      hr = bCapSlvChangeMode((char*)"514");
+      if (FAILED(hr)) {
+          ROS_WARN("failed to change to slvmode %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      return CAST_STATUS(BCAP_S_OK);
     }
     if (errorcode >= 0x84204041 && errorcode <= 0x84204048)
     {
