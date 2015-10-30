@@ -2,6 +2,56 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix stability issues by @ompugao
+
+  * use macro inside recoverController basically
+  * clear error before turn on motor
+  * update recovery procedure
+  * swept fprintf
+  * check bcap status before sending jointvalues
+    Question: is it possible to ensure a realtime loop in this way?
+  * update recovery procedure
+  * add debugging message
+  * not to exit inside bcap initialization functions
+  * add GetMode function, update recovery procedure
+  * add a boilerplait for recovering controller
+  * add utf message library
+  * fix udp things
+  * remove forgotten static variables
+  * do not exit inside slvmove
+  * minor outputmessage updates
+  * add errorcode/errormessage handlers
+  * add BCAP_VARIANT alignment fix
+  * get rid of static variables
+  * add deconstructor
+  * get rid of fprintf
+  * follow standard c++ style class member naming in DensoController
+  * follow standard c++ style class member naming
+  * errorp is not set anywhere
+  * fix initialization procedure, and fix some output messages
+  * do not divide first
+  * fix typo
+  * remove ros::shutdown, it's called in quitRequest
+  * remove useless send command
+  * oops, we cannot send clearerror in slave mode
+  * use initializeCM
+  * remove unused member variables
+  * remove ugly 'need_exit'
+  * fix error_code redeclaration
+  * move intialization procedure to intialize function
+  * remove useless lines
+  * do not allocate vector everytime get current joint vlaues
+  * comment out stoplog
+  * change errorlog output
+  * minor bugfix
+  * treat b-Cap.c as cxx source file
+  * fix allocation, fix debug message
+  * disable send/recv time output
+
+* Contributors: Shohei Fujii
+
 1.0.0 (2015-10-30)
 ------------------
 * update to indigo
