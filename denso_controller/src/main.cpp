@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <map>
 #include "ros/ros.h"
 #include <execinfo.h>
 #include <signal.h>
@@ -56,6 +57,7 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/pointer_cast.hpp>
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
 #include <pr2_controller_manager/controller_manager.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
@@ -65,7 +67,8 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
 #define BCAP_CONNECTION_UDP 1
-#include "b-Cap.c"
+#include "utf8.h"
+#include "b-Cap.h"
 
 #define DEFAULT_SERVER_IP_ADDRESS               "133.11.216.196"                /* Your controller IP address */
 #define DEFAULT_SERVER_PORT_NUM                 5007
@@ -74,13 +77,25 @@
 #define CONTROL_PRIO 0
 
 #define RAD2DEG(x) ((x) * 180.0 / M_PI)
-#define DEG2RAD(x) ((x) / 180.0 * M_PI)
+#define DEG2RAD(x) ((x) * M_PI / 180.0)
 
 class DensoController : public OpenControllersInterface::OpenController
 {
+  class DensoControllerStatus : public OpenControllersInterface::ControllerStatus {
+    public:
+      DensoControllerStatus(BCAP_HRESULT hr): hr_(hr){};
+      DensoControllerStatus(u_int error_code): hr_((BCAP_HRESULT)error_code){};
+      virtual ~DensoControllerStatus(){};
+      virtual bool isHealthy(){
+          return SUCCEEDED(hr_);
+      }
+      BCAP_HRESULT hr_;
+  };
+  typedef boost::shared_ptr<DensoControllerStatus> DensoControllerStatusPtr;
+
 public:
   DensoController() :
-      OpenControllersInterface::OpenController(), need_exit(false), loop(true)
+      OpenControllersInterface::OpenController()
   {
   }
 #define SAFE_EXIT(exit_code) {                  \
@@ -88,61 +103,62 @@ public:
     quitRequest();              \
   }
 
+  virtual ~DensoController(){}
+
   void start()
   {
     OpenController::start();
   }
-  bool loop;
 private:
-  char* server_ip_address;
-  int server_port_number;
+  std::string server_ip_address_;
+  int server_port_number_;
   // for bCap parameters
-  int iSockFD;
-  u_int lhController;
-  u_int lhRobot;
-  int udp_timeout;
-  bool need_exit;
+  int iSockFD_;
+  u_int lhController_;
+  u_int lhRobot_;
+  int udp_timeout_;
+  std::map<std::string, u_int>   var_handlers_;
+  std::map<std::string, u_short> var_types_;
+  char errdesc_buffer_[2048]; // TODO: is this enough?
+
+  std::vector<double> prev_angle_;
+  std::vector<double> prev_vel_;
+  struct timespec prev_time_;
+
 public:
   /**
    * Open a bCap socket.
    */
-  void bCapOpen()
+  BCAP_HRESULT bCapOpen()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
-    hr = bCap_Open(server_ip_address, server_port_number, &iSockFD); /* Init socket  */
-    if (FAILED(hr))
-    {
-      ROS_FATAL("bCap_Open failed\n");
-      exit(1);
-    }
+    hr = bCap_Open(server_ip_address_.c_str(), server_port_number_, &iSockFD_); /* Init socket  */
+    return hr;
   }
 
-  void bCapControllerConnect()
+  BCAP_HRESULT bCapControllerConnect()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
-    hr = bCap_ControllerConnect(iSockFD, (char*)"", (char*)"caoProv.DENSO.VRC", server_ip_address, (char*)"",
-                                &lhController);
-    if (FAILED(hr))
-    {
-      ROS_FATAL("bCap_ControllerConnect failed\n");
-      exit(1);
-    }
+    hr = bCap_ControllerConnect(iSockFD_, (char*)"", (char*)"caoProv.DENSO.VRC", (char*)(server_ip_address_.c_str()), (char*)"",
+                                &lhController_);
+    return hr;
   }
 
-  void bCapClearError()
+  BCAP_HRESULT bCapClearError()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
-    hr = bCap_ControllerExecute(iSockFD, lhController, (char*)"ClearError", (char*)"", &lResult);
+    hr = bCap_ControllerExecute(iSockFD_, lhController_, (char*)"ClearError", (char*)"", &lResult);
     ROS_INFO("clearError %02x %02x", hr, lResult);
+    return hr;
   }
 
   BCAP_HRESULT bCapGetRobot()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
-    hr = bCap_ControllerGetRobot(iSockFD, lhController, (char*)"", (char*)"", &lhRobot); /* Get robot handle */
-    ROS_INFO("GetRobot %02x %02x", hr, lhRobot);
+    hr = bCap_ControllerGetRobot(iSockFD_, lhController_, (char*)"", (char*)"", &lhRobot_); /* Get robot handle */
+    ROS_INFO("GetRobot %02x %02x", hr, lhRobot_);
     return hr;
   }
 
@@ -150,29 +166,143 @@ public:
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     long lResult;
-    hr = bCap_RobotExecute(iSockFD, lhRobot, command, arg, &lResult);
+    hr = bCap_RobotExecute(iSockFD_, lhRobot_, command, arg, &lResult);
     return hr;
   }
 
-  void bCapTakearm()
+  BCAP_HRESULT bCapTakearm()
   {
     BCAP_HRESULT hr = bCapRobotExecute("Takearm", "");
-    if (FAILED(hr))
-    {
-      ROS_FATAL("failed to takearm");
-      exit(1);
-    }
+    return hr;
   }
 
-  void bCapSetExternalSpeed(char* arg)
+  BCAP_HRESULT bCapSetExternalSpeed(char* arg)
   {
     BCAP_HRESULT hr = bCapRobotExecute("ExtSpeed", arg);
-    if (FAILED(hr))
-    {
-      ROS_FATAL("failed to bCapSetExternalSpeed");
-      exit(1);
-    }
+    return hr;
   }
+
+  void bCapInitializeVariableHandlers()
+  {
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("MODE",bCapControllerGetVariable("@MODE")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("ERROR_CODE",bCapControllerGetVariable("@ERROR_CODE")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("ERROR_DESCRIPTION",bCapControllerGetVariable("@ERROR_DESCRIPTION")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("VERSION",bCapControllerGetVariable("@VERSION")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("SPEED",bCapRobotGetVariable("@SPEED")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("ACCEL",bCapRobotGetVariable("@ACCEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("DECEL",bCapRobotGetVariable("@DECEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("JSPEED",bCapRobotGetVariable("@JSPEED")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("JACCEL",bCapRobotGetVariable("@JACCEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("JDECEL",bCapRobotGetVariable("@JDECEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EXTSPEED",bCapRobotGetVariable("@EXTSPEED")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EXTACCEL",bCapRobotGetVariable("@EXTACCEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EXTDECEL",bCapRobotGetVariable("@EXTDECEL")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("SERVO_ON",bCapRobotGetVariable("@SERVO_ON")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("BUSY_STATUS",bCapControllerGetVariable("@BUSY_STATUS")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("CURRENT_TIME",bCapControllerGetVariable("@CURRENT_TIME")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("LOCK",bCapControllerGetVariable("@LOCK")));
+
+    var_types_.insert(std::map<std::string, u_short>::value_type("ERROR_CODE", VT_I4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("MODE", VT_I4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("ERROR_DESCRIPTION", VT_BSTR));
+    var_types_.insert(std::map<std::string, u_short>::value_type("VERSION", VT_BSTR));
+    var_types_.insert(std::map<std::string, u_short>::value_type("SPEED", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("ACCEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("DECEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("JSPEED", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("JACCEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("JDECEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EXTSPEED", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EXTACCEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EXTDECEL", VT_R4));
+    var_types_.insert(std::map<std::string, u_short>::value_type("BUSY_STATUS", VT_BOOL));
+    var_types_.insert(std::map<std::string, u_short>::value_type("CURRENT_TIME", VT_DATE));
+    var_types_.insert(std::map<std::string, u_short>::value_type("LOCK", VT_BOOL));
+  }
+
+  u_int bCapControllerGetVariable(const std::string& varname)
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    u_int varresult;
+    hr = bCap_ControllerGetVariable(iSockFD_, lhController_, (char*)(varname.c_str()), (char*)"", &varresult);
+    if(FAILED(hr)) {
+        ROS_WARN("failed to controller get variable '%s' hr:%02x result:%02x", varname.c_str(), hr, varresult);
+    }
+    return varresult;
+  }
+
+  u_int bCapRobotGetVariable(const std::string& varname)
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    u_int varresult;
+    hr = bCap_RobotGetVariable(iSockFD_, lhRobot_, (char*)(varname.c_str()), (char*)"", &varresult);
+    if(FAILED(hr)) {
+        ROS_WARN("failed to controller get variable '%s' hr:%02x result:%02x", varname.c_str(), hr, varresult);
+    }
+    return varresult;
+  }
+
+  u_int __errorcode__;
+  u_int bCapGetErrorCode()
+  {
+    //u_int errorcode = 0; // this local variable is not allocated in debug mode...? why...
+    __errorcode__ = 0;
+    if( var_types_.find("ERROR_CODE") != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["ERROR_CODE"], &__errorcode__);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get ERROR_CODE, return %02x instead.", hr);
+        return hr;
+      }
+      return __errorcode__;
+    }
+    ROS_WARN("ERROR_CODE is not in variable handlers");
+    return 0;
+  }
+
+  // 1: manual, 2: teachcheck, 3:auto
+  u_int bCapGetMode()
+  {
+    //u_int errorcode = 0; // this local variable is not allocated in debug mode...? why...
+    u_int mode = 0;
+    if( var_types_.find("MODE") != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["MODE"], &mode);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get MODE, return 0 instead.");
+        return 0;
+      }
+      return mode;
+    }
+    ROS_WARN("No handler for MODE, return 0 instead.");
+    return 0;
+  }
+
+  u_int bCapErrorDescription(std::string& errormsg)
+  {
+    if( var_types_.find("ERROR_DESCRIPTION") != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["ERROR_DESCRIPTION"], errdesc_buffer_);
+      errormsg = errdesc_buffer_; //copy
+
+      // find null
+      size_t strlen = 0;
+      while(strlen<2000) {
+        if( *((uint16_t*)errdesc_buffer_+strlen) == 0 ) {
+          break;
+        }
+        ++strlen;
+      }
+
+      ROS_INFO("raw error description: %s", errdesc_buffer_);
+      try {
+          utf8::utf16to8((uint16_t*)errdesc_buffer_, (uint16_t*)errdesc_buffer_+strlen, std::back_inserter(errormsg));
+      } catch (utf8::invalid_utf16& e) {
+          errormsg = errdesc_buffer_; //copy
+      }
+      return hr;
+    }
+    ROS_WARN("ERROR_DESCRIPTION is not in variable handlers");
+    return 0;
+  }
+
 
   BCAP_HRESULT bCapMotor(bool command)
   {
@@ -188,40 +318,24 @@ public:
     return hr;
   }
 
-  std::vector<double> bCapCurJnt()
+  BCAP_HRESULT bCapCurJnt(std::vector<double>& jointvalues)
   {
-    double dJnt[8];
+    jointvalues.resize(8);
     BCAP_HRESULT hr = BCAP_E_FAIL;
-    std::vector<double> ret;
-    while (FAILED(hr))
-    {
-      hr = bCap_RobotExecute(iSockFD, lhRobot, "CurJnt", "", &dJnt);
-      if (SUCCEEDED(hr))
-      {
-        for (int i = 0; i < 8; i++)
-          ret.push_back(dJnt[i]);
-        fprintf(stderr, "CurJnt : %f %f %f %f %f %f\n", dJnt[0], dJnt[1], dJnt[2], dJnt[3], dJnt[4], dJnt[5], dJnt[6]);
-        break;
-      }
-      else
-      {
-        fprintf(stderr, "failed to read joint angles, retry\n");
-      }
-    }
-    return ret;
+    hr = bCap_RobotExecute(iSockFD_, lhRobot_, "CurJnt", "", &jointvalues[0]);
+    return hr;
   }
 
   BCAP_HRESULT bCapSlvChangeMode(char* arg)
   {
     long lResult;
-    BCAP_HRESULT hr = bCap_RobotExecute(iSockFD, lhRobot, "slvChangeMode", arg, &lResult);
-    fprintf(stderr, "slvChangeMode %02x %02x\n", hr, lResult);
+    BCAP_HRESULT hr = bCap_RobotExecute(iSockFD_, lhRobot_, "slvChangeMode", arg, &lResult);
+    ROS_INFO("change slave mode: hr: %02x, result: %02x", hr, lResult);
     return hr;
   }
 
   BCAP_HRESULT bCapRobotSlvMove(BCAP_VARIANT* pose, BCAP_VARIANT* result)
   {
-    //ROS_INFO("bCapRobotSlvMove");
     // ROS_INFO("sending angle: %f %f %f %f %f %f",
     //          pose->Value.DoubleArray[0],
     //          pose->Value.DoubleArray[1],
@@ -233,12 +347,9 @@ public:
     // struct timeval tv;
     // tv.tv_sec = 0;
     // tv.tv_usec = 1000 * 1;
-    // setsockopt(iSockFD, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    // setsockopt(iSockFD_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     extern int failed_to_send_packet;
     struct timespec tick, before;
-    static std::vector<double> prev_angle;
-    static std::vector<double> prev_vel;
-    static struct timespec prev_time;
     std::vector<double> current_angle;
     std::vector<double> current_vel;
     std::vector<double> current_acc;
@@ -249,35 +360,42 @@ public:
 
     char* command = (char*)"slvMove";
     clock_gettime(CLOCK_MONOTONIC, &tick);
-    BCAP_HRESULT hr = bCap_RobotExecute2(iSockFD, lhRobot, command, pose, result);
+    BCAP_HRESULT hr = bCap_RobotExecute2(iSockFD_, lhRobot_, command, pose, result);
+
+    if (FAILED(hr)) {
+      ROS_WARN("failed to slvmove, errorcode: %02x", hr);
+    }
+
     clock_gettime(CLOCK_MONOTONIC, &before);
     static const int NSEC_PER_SECOND = 1e+9;
     //static const int USEC_PER_SECOND = 1e6;
     double roundtrip = (before.tv_sec + double(before.tv_nsec) / NSEC_PER_SECOND)
         - (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND);
 
-    if (prev_angle.size() > 0)
+    if (prev_angle_.size() > 0)
     {
       double tm = (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND)
-          - (prev_time.tv_sec + double(prev_time.tv_nsec) / NSEC_PER_SECOND);
+          - (prev_time_.tv_sec + double(prev_time_.tv_nsec) / NSEC_PER_SECOND);
+      current_vel.resize(6);
       for (size_t i = 0; i < 6; i++)
       {
-        current_vel.push_back((current_angle[i] - prev_angle[i]) / tm);
+        current_vel.at(i) = (current_angle[i] - prev_angle_[i]) / tm;
       }
     }
-    if (prev_vel.size() > 0)
+    if (prev_vel_.size() > 0)
     {
       double tm = (tick.tv_sec + double(tick.tv_nsec) / NSEC_PER_SECOND)
-          - (prev_time.tv_sec + double(prev_time.tv_nsec) / NSEC_PER_SECOND);
+          - (prev_time_.tv_sec + double(prev_time_.tv_nsec) / NSEC_PER_SECOND);
+      current_acc.resize(6);
       for (size_t i = 0; i < 6; i++)
       {
-        current_acc.push_back((current_vel[i] - prev_vel[i]) / tm);
+        current_acc.at(i) = (current_vel[i] - prev_vel_[i]) / tm;
       }
     }
 
-    prev_time = tick;
-    ROS_INFO("current angle: %f %f %f %f %f %f", current_angle[0], current_angle[1], current_angle[2], current_angle[3],
-             current_angle[4], current_angle[5]);
+    prev_time_ = tick;
+    //ROS_INFO("current angle: %f %f %f %f %f %f", current_angle[0], current_angle[1], current_angle[2], current_angle[3],
+             //current_angle[4], current_angle[5]);
 
     // if (current_vel.size() > 0) {
     //   ROS_INFO("current vel: %f %f %f %f %f %f",
@@ -288,14 +406,14 @@ public:
     //            current_vel[4],
     //            current_vel[5]);
     //   }
-    //   if (prev_vel.size() > 0) {
+    //   if (prev_vel_.size() > 0) {
     //     ROS_INFO("prev vel: %f %f %f %f %f %f",
-    //            prev_vel[0],
-    //            prev_vel[1],
-    //            prev_vel[2],
-    //            prev_vel[3],
-    //            prev_vel[4],
-    //            prev_vel[5]);
+    //            prev_vel_[0],
+    //            prev_vel_[1],
+    //            prev_vel_[2],
+    //            prev_vel_[3],
+    //            prev_vel_[4],
+    //            prev_vel_[5]);
     //   }
     // if (current_acc.size() > 0) {
     //     ROS_INFO("current acc: %f %f %f %f %f %f",
@@ -309,18 +427,18 @@ public:
 
     if (failed_to_send_packet)
     {
-      fprintf(stderr, "roundtrip: %f\n", roundtrip);
-      setUDPTimeout(0, udp_timeout);
+      ROS_WARN("  roundtrip: %f", roundtrip);
+      setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
 
       // print the angle
-      // if (prev_angle.size() > 0) {
+      // if (prev_angle_.size() > 0) {
       //   ROS_INFO("prev angle: %f %f %f %f %f %f",
-      //            prev_angle[0],
-      //            prev_angle[1],
-      //            prev_angle[2],
-      //            prev_angle[3],
-      //            prev_angle[4],
-      //            prev_angle[5]);
+      //            prev_angle_[0],
+      //            prev_angle_[1],
+      //            prev_angle_[2],
+      //            prev_angle_[3],
+      //            prev_angle_[4],
+      //            prev_angle_[5]);
       // }
       // ROS_INFO("current angle: %f %f %f %f %f %f",
       //          current_angle[0],
@@ -330,192 +448,131 @@ public:
       //          current_angle[4],
       //          current_angle[5]);
     }
-    if (FAILED(hr))
-    {
-      // hr = bCapRobotExecute("stopLog", "");
-      // if (FAILED(hr)) {
-      //   fprintf(stderr, "failed to disable logging mode\n");
-      // }
-      ROS_FATAL("bCapRobotSlvMove");
-      if (hr == BCAP_E_BUF_FULL)
-      {
-        ROS_WARN("buffer over flow slvMove %02x", hr);
-      }
-      else
-      {
-        ROS_WARN("failed to send slvMove %02x", hr);
-      }
-      finalize();
-      cleanupPidFile();
-      kill(getpid(), SIGKILL);
-    }
 
     // memoize prev angle
-    prev_angle = current_angle;
-    prev_vel = current_vel;
+    prev_angle_ = current_angle;
+    prev_vel_ = current_vel;
     return hr;
   }
 
   virtual void finalizeHW()
   {
     ROS_INFO("finalizeHW is called");
-    if (!dryrunp)
+    if (!dryrunp_)
     {
       setUDPTimeout(2, 0);
       sleep(1);
       long lResult;
       BCAP_HRESULT hr = BCAP_S_OK;
       //bCapClearError();
-      // disable logging mode
-      hr = bCapRobotExecute("stopLog", "");
-      if (FAILED(hr))
-      {
-        fprintf(stderr, "failed to disable logging mode\n");
-      }
 
       hr = bCapSlvChangeMode((char*)"0");
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to change slave mode\n");
+        ROS_WARN("failed to change slave mode");
+        SAFE_EXIT(1);
       }
+
+      // disable logging mode
+      // hr = bCapRobotExecute("stopLog", "");
+      // if (FAILED(hr))
+      // {
+      //   ROS_WARN(failed to disable logging mode");
+      // }
+
       hr = bCapMotor(false);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to motor off\n");
+        ROS_WARN("failed to motor off");
       }
       else
       {
-        fprintf(stderr, "successed to motor off\n");
+        ROS_INFO("successed to motor off");
       }
-      hr = bCap_RobotExecute(iSockFD, lhRobot, (char*)"Givearm", (char*)"", &lResult);
+      hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to give arm\n");
+        ROS_WARN("failed to give arm");
       }
       else
       {
-        fprintf(stderr, "successed to give arm\n");
+        ROS_INFO("successed to give arm");
       }
-      hr = bCap_RobotRelease(iSockFD, lhRobot); /* Release robot handle */
+      hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to release the robot\n");
+        ROS_WARN("failed to release the robot");
       }
       else
       {
-        fprintf(stderr, "successed to release the robot\n");
+        ROS_INFO( "successed to release the robot");
       }
-      hr = bCap_ControllerDisconnect(iSockFD, lhController);
+      hr = bCap_ControllerDisconnect(iSockFD_, lhController_);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to disconnect from the controller\n");
+        ROS_WARN("failed to disconnect from the controller");
       }
       else
       {
-        fprintf(stderr, "successed to disconnect from the controller\n");
+        ROS_INFO("successed to disconnect from the controller");
       }
       /* Stop b-CAP service (Very important in UDP/IP connection) */
-      hr = bCap_ServiceStop(iSockFD);
+      hr = bCap_ServiceStop(iSockFD_);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to stop the service\n");
+        ROS_WARN("failed to stop the service");
       }
       else
       {
-        fprintf(stderr, "successed to stop the service\n");
+        ROS_INFO("successed to stop the service");
       }
       sleep(1);
-      hr = bCap_Close(iSockFD);
+      hr = bCap_Close(iSockFD_);
       if (FAILED(hr))
       {
-        fprintf(stderr, "failed to close bCap\n");
+        ROS_WARN("failed to close bCap");
       }
       else
       {
-        fprintf(stderr, "successed to close bCap\n");
+        ROS_INFO("successed to close bCap");
       }
     }
-    fprintf(stderr, "finalizing done\n");
+    ROS_INFO("finalizing finished");
   }
 
-  bool updateJoints(struct timespec* spec_result)
+  OpenControllersInterface::ControllerStatusPtr updateJoints(struct timespec* spec_result)
   {
-    static bool initialp = true;
-    bool errorp = false;
-    if (initialp)
-    {
-      ROS_INFO("first loop");
-
-      initialp = false;
-      std::vector<double> cur_jnt;
-      if (!dryrunp)
-      {
-        ROS_INFO("hoge");
-        cur_jnt = bCapCurJnt();
-        BCAP_VARIANT vntPose, vntResult;
-        vntPose.Type = VT_R8 | VT_ARRAY;
-        vntPose.Arrays = 8;
-        for (int i = 0; i < 8; i++)
-        {
-          vntPose.Value.DoubleArray[i] = cur_jnt[i];
-        }
-        BCAP_HRESULT hr = BCAP_S_OK;
-        while (hr == 0 && g_halt_requested == false)
-        {
-          hr = bCapRobotSlvMove(&vntPose, &vntResult);
-          ROS_INFO("initialize slvmove");
-        }
-        ROS_INFO("initialization done");
-      }
-      // fill ac
-      int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
-      { // *** js and ac must be consistent
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
-        if (!dryrunp)
-        {
-          ac->state_.position_ = DEG2RAD(cur_jnt[i]);
-        }
-        else
-        {
-          ac->state_.position_ = 0;
-        }
-        i++;
-      }
-    }
     // build vntPose
     BCAP_VARIANT vntPose;
     vntPose.Type = VT_R8 | VT_ARRAY;
     vntPose.Arrays = 8;
     {
       int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
       { // *** js and ac must be consistent
-        pr2_mechanism_model::JointState *js = cm->state_->getJointState((*it)->joint_names_[0]);
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
+        pr2_mechanism_model::JointState *js = cm_->state_->getJointState((*it)->joint_names_[0]);
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
         // ROS_INFO("js: %f, ac: %f", js->commanded_effort_, ac->state_.position_);
         double target_angle = RAD2DEG(ac->state_.position_);
-        //if (i > 1) {     // moves only the 6-3rd joints
         if (true)
         {
           target_angle = RAD2DEG(ac->state_.position_ + js->commanded_effort_);
           // check min/max
 #define SAFE_OFFSET_DEG 1
-          if (RAD2DEG(cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower)
+          if (RAD2DEG(cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower)
               + SAFE_OFFSET_DEG > target_angle)
           {
             ROS_WARN("too small joint angle! %f", target_angle);
             target_angle = RAD2DEG(
-                cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower) + SAFE_OFFSET_DEG;
+                cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->lower) + SAFE_OFFSET_DEG;
           }
-          else if (RAD2DEG(cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper)
+          else if (RAD2DEG(cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper)
               - SAFE_OFFSET_DEG < target_angle)
           {
             ROS_WARN("too large joint angle! %f", target_angle);
             target_angle = RAD2DEG(
-                cm->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper) - SAFE_OFFSET_DEG;
+                cm_->state_->model_->robot_model_.getJoint((*it)->joint_names_[0])->limits->upper) - SAFE_OFFSET_DEG;
           }
           //ROS_INFO("target_angle: %f", target_angle);
         }
@@ -527,50 +584,67 @@ public:
         i++;
       }
     }
-
+    ROS_DEBUG("target angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
+          
     // send vntPose
+    DensoControllerStatusPtr status;
     BCAP_VARIANT vntReturn;
-    if (!dryrunp)
+    if (!dryrunp_)
     {
       if (spec_result)
       {
         clock_gettime(CLOCK_REALTIME, spec_result);
       }
+      // check bcap status beforehand
+      u_int errorcode;
+      errorcode = bCapGetErrorCode();
+      if (FAILED(errorcode)) {
+        ROS_WARN("bad status! robot needs recovery! hr: %02x", errorcode);
+        status.reset(new DensoControllerStatus(errorcode));
+        return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(status);
+      }
       BCAP_HRESULT hr = bCapRobotSlvMove(&vntPose, &vntReturn);
+      ROS_DEBUG("updateJoints hr: %02x", hr);
       if (hr == 0xF200501)
       {
-        //ROS_INFO("buf is filled, OK");
+        //ROS_INFO("buf is filled, it's fine.");
+        status.reset(new DensoControllerStatus(BCAP_S_OK));
+      }
+      else if (FAILED(hr))
+      {
+        status.reset(new DensoControllerStatus(hr));
       }
       else
       {
-        while (hr == 0 && g_halt_requested == false)
-        { // 0 means that there is empty buffer
-          fprintf(stderr, "buf space found, re-send the angles to the controller\n");
-          //ROS_WARN("buf space found, re-send the angles to the controller");
-          if (spec_result)
-          {
-            clock_gettime(CLOCK_REALTIME, spec_result);
-          }
-          hr = bCapRobotSlvMove(&vntPose, &vntReturn);
-          if (hr == 0xF200501)
-          {
-            ROS_WARN("buf is filled");
-          }
-        }
+        status.reset(new DensoControllerStatus(BCAP_S_OK));
+        //while (hr == 0 && g_halt_requested_ == false)
+        //{
+        //  // 0 means that there is an empty buffer
+        //  ROS_WARN("buf space found, re-send the angles to the controller");
+        //  if (spec_result)
+        //  {
+        //    clock_gettime(CLOCK_REALTIME, spec_result);
+        //  }
+        //  hr = bCapRobotSlvMove(&vntPose, &vntReturn);
+        //  if (hr == 0xF200501)
+        //  {
+        //    ROS_WARN("buf is filled");
+        //  }
+        //}
       }
     }
 
-    hw->current_time_ = ros::Time::now(); // ???
-    if (!errorp)
+    ROS_DEBUG("current angles(response): %f %f %f %f %f %f", vntReturn.Value.DoubleArray[0], vntReturn.Value.DoubleArray[1], vntReturn.Value.DoubleArray[2], vntReturn.Value.DoubleArray[3], vntReturn.Value.DoubleArray[4], vntReturn.Value.DoubleArray[5]);
+    hw_->current_time_ = ros::Time::now(); // ???
     {
       int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
       { // *** js and ac must be consistent
-        pr2_mechanism_model::JointState *js = cm->state_->getJointState((*it)->joint_names_[0]);
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
+        pr2_mechanism_model::JointState *js = cm_->state_->getJointState((*it)->joint_names_[0]);
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
         ac->state_.velocity_ = 0;
-        if (!dryrunp)
+        if (!dryrunp_)
         { // if not in the dryrun mode, we just copy the vntReturn value
           ac->state_.position_ = DEG2RAD(vntReturn.Value.DoubleArray[i]);
         }
@@ -582,30 +656,214 @@ public:
         i++;
       }
     }
-    return !errorp;
+    return boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(status);
   }
 
+
+  OpenControllersInterface::ControllerStatusPtr recoverController()
+  {
+#define CAST_STATUS(hr) \
+    boost::static_pointer_cast<OpenControllersInterface::ControllerStatus>(DensoControllerStatusPtr(new DensoControllerStatus(hr)))
+
+    ROS_WARN("try to recover controller...");
+    u_int errorcode;
+    std::string errormsg;
+
+    errorcode = bCapGetErrorCode();
+    bCapErrorDescription(errormsg);
+    
+    ROS_INFO("errormsg: %s", errormsg.c_str());
+
+    if (errorcode == BCAP_E_UNEXPECTED)
+    {
+      ROS_FATAL("Unexpected Error occured. no way to recover!");
+      return CAST_STATUS(errorcode);
+    }
+
+    if (errorcode >= 0x83204071 && errorcode <= 0x83204078)
+    {
+      ROS_INFO("joint angle is over the software limit.");
+      ROS_INFO("currently, there is no way to recover, quit.");
+      // TODO publish message and return healthy status so that an application can send recovery-trajectory.
+      return CAST_STATUS(BCAP_E_FAIL);
+    }
+    if (errorcode >= 0x84204081 && errorcode <= 0x842040A8)
+    {
+      ROS_INFO("joint angle velocity is over the software limit.");
+      ROS_INFO("currently, there is no way to recover, quit.");
+      // TODO publish message and return healthy status so that an application can send recovery-trajectory.
+      return CAST_STATUS(BCAP_E_FAIL);
+    }
+    if (errorcode >= 0x84204051 && errorcode <= 0x84204058)
+    {
+      ROS_INFO("joint angle velocity(sent) is over the software limit.");
+      //ROS_INFO("currently, there is no way to recover, quit.");
+      //return CAST_STATUS(BCAP_E_FAIL);
+      // TODO publish message and return healthy status so that an application can send recovery-trajectory.
+      BCAP_HRESULT hr;
+      hr = bCapClearError();
+      if (FAILED(hr)) {
+          ROS_WARN("failed to clear error %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      hr = bCapMotor(true);
+      if (FAILED(hr)) {
+          ROS_WARN("failed to turn on motor %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      hr = bCapSlvChangeMode((char*)"514");
+      if (FAILED(hr)) {
+          ROS_WARN("failed to change to slvmode %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      return CAST_STATUS(BCAP_S_OK);
+    }
+    if (errorcode >= 0x84204041 && errorcode <= 0x84204048)
+    {
+      ROS_INFO("joint angle acceleration is over the software limit.");
+      ROS_INFO("currently, there is no way to recover, quit.");
+      // TODO publish message and return healthy status so that an application can send recovery-trajectory.
+      return CAST_STATUS(BCAP_E_FAIL);
+    }
+
+
+    if (errorcode == 0x83204231)
+    {
+      ROS_INFO("invalid command was sent and everything stopped, needs to restart everything");
+      //TODO restart everything
+      return CAST_STATUS(BCAP_E_FAIL);
+    }
+
+    if (errorcode == 0x81501003)
+    {
+      ROS_INFO("motor is off, turn on");
+      BCAP_HRESULT hr = bCapMotor(true);
+      return CAST_STATUS(hr);
+    }
+
+    if (errorcode == 0x84201486)
+    {
+        u_int mode;
+        while(!g_quit_)
+        {
+            mode = bCapGetMode();
+            if (mode != 3) {
+              // user set controller to manual or teachcheck mode, wait until the user set back to auto
+              ROS_WARN("waiting until you set back to auto");
+              sleep(2);
+            } else {
+              break;
+            }
+        }
+        //TODO restart bcap server
+        BCAP_HRESULT hr;
+        hr = bCapControllerConnect();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to connect controller %02x", hr);
+          return CAST_STATUS(hr);
+        }
+        hr = bCapClearError();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to clear error %02x", hr);
+          return CAST_STATUS(hr);
+        }
+        hr = bCapGetRobot();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to get robot %02x", hr);
+          return CAST_STATUS(hr);
+        }
+        hr = bCapTakearm();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to take arm %02x", hr);
+          return CAST_STATUS(hr);
+        }
+        hr = bCapMotor(true);
+        if (FAILED(hr)) {
+          ROS_WARN("failed to turn on motor %02x", hr);
+          return CAST_STATUS(hr);
+        }
+        hr = bCapSlvChangeMode((char*)"514");
+        if (FAILED(hr)) {
+          ROS_WARN("failed to change to slvmode %02x", hr);
+          return CAST_STATUS(hr);
+        }
+        return CAST_STATUS(BCAP_S_OK);
+    }
+    if (errorcode == 0x83500121)
+    {
+      ROS_INFO("robot is not in slavemode, try to change it");
+      BCAP_HRESULT hr;
+      hr = bCapClearError();
+      if (FAILED(hr)) return CAST_STATUS(hr);
+      hr = bCapMotor(true);
+      if (FAILED(hr)) {
+        ROS_WARN("failed to turn on motor, cannot recover");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      if (FAILED(hr)) {
+        ROS_WARN("failed to change slvmode, cannot recover");
+      }
+      return CAST_STATUS(hr);
+    }
+    if (errorcode == 0x83501032)
+    {
+      //TODO rethink the way to recover
+      ROS_INFO("invalid command when the robot is in slave mode, disable slave mode");
+      BCAP_HRESULT hr = bCapSlvChangeMode((char*)"0"); // 0x202
+      return CAST_STATUS(hr);
+    }
+
+    if (errorcode == 0x81501025)
+    {
+      ROS_INFO("do not send message while an error is occuring");
+      BCAP_HRESULT hr = bCapClearError();
+      return CAST_STATUS(hr);
+    }
+
+    return CAST_STATUS(BCAP_S_OK);
+#undef CAST_STATUS(hr)
+  }
+ 
   void setUDPTimeout(long sec, long usec)
   {
 #ifdef BCAP_CONNECTION_UDP
     struct timeval tv;
     tv.tv_sec = sec;
     tv.tv_usec = usec;
-    if (setsockopt(iSockFD, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
+    if (setsockopt(iSockFD_, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0)
     {
-      perror("Error");
+      ROS_WARN("Failed to set send timeout");
+    }
+    if (setsockopt(iSockFD_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
+    {
+      ROS_WARN("Failed to set recv timeout");
     }
 #endif
   }
 
-  void bCapServerStart()
+  BCAP_HRESULT bCapServerStart()
   {
-    BCAP_HRESULT hr = bCap_ServiceStart(iSockFD); /* Start b-CAP service */
-    if (FAILED(hr))
-    {
-      ROS_FATAL("bCap_ServiceStart failed\n");
-      SAFE_EXIT(1);
-    }
+    BCAP_HRESULT hr = bCap_ServiceStart(iSockFD_); /* Start b-CAP service */
+    return hr;
+  }
+
+  /**
+   * @overridden
+   */
+  void initializeCM()
+  {
+    hw_ = new pr2_hardware_interface::HardwareInterface();
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j1_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j2_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j3_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j4_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("j5_motor"));
+    hw_->addActuator(new pr2_hardware_interface::Actuator("flange_motor"));
+    // // Create controller manager
+    //pr2_controller_manager::ControllerManager cm_(ec.hw_);
+    cm_ = boost::shared_ptr<pr2_controller_manager::ControllerManager>(
+        new pr2_controller_manager::ControllerManager(hw_));
   }
 
   /**
@@ -613,56 +871,51 @@ public:
    */
   void initializeHW()
   {
-
-    hw = new pr2_hardware_interface::HardwareInterface();
-    hw->addActuator(new pr2_hardware_interface::Actuator("j1_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j2_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j3_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j4_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("j5_motor"));
-    hw->addActuator(new pr2_hardware_interface::Actuator("flange_motor"));
-    // // Create controller manager
-    //pr2_controller_manager::ControllerManager cm(ec.hw_);
-    cm = boost::shared_ptr<pr2_controller_manager::ControllerManager>(
-        new pr2_controller_manager::ControllerManager(hw));
-
     // for denso connection
-    if (!dryrunp)
+    if (!dryrunp_)
     {
-      need_exit = true;
+      BCAP_HRESULT hr;
       ROS_INFO("bCapOpen");
-      bCapOpen();
+      hr = bCapOpen();
+      if(FAILED(hr)) exit(1);
+      setUDPTimeout(2, 0); // 2000msec
       ROS_INFO("bCapServerStart");
-      setUDPTimeout(2, 0); // 200msec
-      bCapServerStart();
+      hr = bCapServerStart();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapControllerConnect");
-      bCapControllerConnect();
+      hr = bCapControllerConnect();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapClearError");
-      bCapClearError();
+      hr = bCapClearError();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapGetRobot");
-      bCapGetRobot();
+      hr = bCapGetRobot();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapTakearm");
-      bCapTakearm();
+      hr = bCapTakearm();
+      if(FAILED(hr)) exit(1);
       ROS_INFO("bCapSetExternalSpeed");
-      bCapSetExternalSpeed((char*)"80.0");
+      hr = bCapSetExternalSpeed((char*)"100.0");
+      if(FAILED(hr)) exit(1);
+
+      bCapInitializeVariableHandlers();
 
       {
         ROS_WARN("bCapMotor On");
-        BCAP_HRESULT hr = bCapMotor(true);
+        hr = bCapMotor(true);
         if (FAILED(hr))
         {
-          ROS_FATAL("failed to motor on");
+          u_int errorcode;
+          std::string errormsg;
+          errorcode = bCapGetErrorCode();
+          bCapErrorDescription(errormsg);
+          ROS_INFO("errormsg: %s", errormsg.c_str());
+          ROS_WARN("failed to motor on, errorcode: %02x, errormsg: %s", errorcode, errormsg.c_str());
+          //ROS_FATAL("failed to motor on");
           finalize();
           SAFE_EXIT(1);
         }
       }
-      // sleep(15);
-      // // read joint angles sometimes to skip illegal values
-      std::vector<double> cur_jnt = bCapCurJnt();
-      // 100 * 50m = 5000
-      // for (int i = 0; i < 5000 / 20; i++) {
-      //   cur_jnt = bCapCurJnt();
-      // }
 
       // enable logging
       {
@@ -683,7 +936,6 @@ public:
       //   }
       // }
 
-      need_exit = false;
       {
         BCAP_HRESULT hr = bCapSlvChangeMode((char*)"514"); // 0x202
         //BCAP_HRESULT hr = bCapSlvChangeMode((char*)"258"); // 0x102
@@ -694,31 +946,37 @@ public:
         }
       }
 
-      //sleep(5);
+      ROS_INFO("initialize bCap slave connection");
+      std::vector<double> cur_jnt;
+      hr = bCapCurJnt(cur_jnt);
+      BCAP_VARIANT vntPose, vntResult;
+      vntPose.Type = VT_R8 | VT_ARRAY;
+      vntPose.Arrays = 8;
+      for (int i = 0; i < 8; i++)
+      {
+        vntPose.Value.DoubleArray[i] = cur_jnt[i];
+      }
+      // Fill the buffer for later use, 
+      // unless fill the buffer, bCap slave will fall down 
+      for (int i = 0; i < 4; i++) {
+          hr = bCapRobotSlvMove(&vntPose, &vntResult);
+          if (FAILED(hr)) {
+            ROS_WARN("result is %02x, failed", hr);
+            SAFE_EXIT(1);
+          }
+      }
+      ROS_INFO("bCap slave initialization done");
+
       // fill ac
       int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm->model_.transmissions_.begin();
-          it != cm->model_.transmissions_.end(); ++it)
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
       { // *** js and ac must be consistent
-        pr2_hardware_interface::Actuator *ac = hw->getActuator((*it)->actuator_names_[0]);
-        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> degree
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
+        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
         i++;
       }
-      setUDPTimeout(0, udp_timeout);
-      sleep(5);
-      bCapCurJnt();
-      bCapCurJnt();
-      bCapCurJnt();
-      // for (int i = 0; i < 5; i++)
-      //   bCapRobotSlvMove(&vntPose, &vntResult);
-      // hr = bCapRobotSlvMove(&vntPose, &vntResult);
-      // if (hr == 0) {
-      //   ROS_WARN("buf space found");
-      // }
-      // hr = bCapRobotSlvMove(&vntPose, &vntResult);
-      // if (hr == 0) {
-      //   ROS_WARN("buf space found");
-      // }
+      setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
     }
   }
 
@@ -728,46 +986,32 @@ public:
     //     moving them to somewhere else might make more sense.
 
     // Determine ip address of the robot's embedded machine.
-    std::string server_ip_address_str;
-    if (!node.getParam("server_ip", server_ip_address_str))
+    if (!node.getParam("server_ip", server_ip_address_))
     {
-      server_ip_address = (char*)DEFAULT_SERVER_IP_ADDRESS;
-    }
-    else
-    {
-      server_ip_address = (char*)malloc(sizeof(char) * (server_ip_address_str.length() + 1));
-      for (size_t i = 0; i < server_ip_address_str.length(); i++)
-      {
-        server_ip_address[i] = server_ip_address_str.at(i);
-      }
-      server_ip_address[server_ip_address_str.length()] = '\0';
+      server_ip_address_ = (char*)DEFAULT_SERVER_IP_ADDRESS;
     }
 
     // Determine the pre-set port number used to communicate the robot's embedded computer via bCap.
-    if (!node.getParam("server_port", server_port_number))
+    if (!node.getParam("server_port", server_port_number_))
     {
-      server_port_number = DEFAULT_SERVER_PORT_NUM;
+      server_port_number_ = DEFAULT_SERVER_PORT_NUM;
     }
 
-    ROS_WARN("server: %s:%d", server_ip_address, server_port_number);
+    ROS_WARN("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
 
     // Determine the pre-set UDP timeout length.
-    if (!node.getParam("udp_timeout", udp_timeout))
+    if (!node.getParam("udp_timeout", udp_timeout_))
     {
-      udp_timeout = DEFAULT_UDP_TIMEOUT;
+      udp_timeout_ = DEFAULT_UDP_TIMEOUT;
     }
-    ROS_WARN("udp_timeout: %d micro sec", udp_timeout);
+    ROS_WARN("udp_timeout: %d micro sec", udp_timeout_);
   }
 
   void quitRequest()
   {
-    fprintf(stderr, "DensoController::quitRequest\n");
+    ROS_INFO("request quit to denso controller");
     OpenController::quitRequest(); // call super class
-    fprintf(stderr, "DensoController::quitRequest called\n");
-    if (need_exit)
-    {
-      exit(1);
-    }
+    ros::shutdown();
   }
 };
 
@@ -775,9 +1019,8 @@ DensoController g_controller;
 void quitRequested(int sigint)
 {
   // do nothing
-  std::cerr << "quitRequested" << std::endl;
+  ROS_WARN("request quit to denso controller using signal");
   g_controller.quitRequest();
-  ros::shutdown();
 }
 
 int main(int argc, char *argv[])
@@ -806,20 +1049,19 @@ int main(int argc, char *argv[])
   g_controller.initialize();
   boost::thread t(&DensoController::start, &g_controller);
   {
-    //OpenControllersInterface::Finalizer finalizer(&g_controller);
+    OpenControllersInterface::Finalizer finalizer(&g_controller);
     ros::Rate loop_rate(100);
     while (ros::ok())
     {
       ros::spinOnce();
       loop_rate.sleep();
     }
-    fprintf(stderr, "ROS has been terminated\n");
+    ROS_WARN("ROS has been terminated");
     t.join();
-    fprintf(stderr, "start thread has been terminated\n");
-    g_controller.finalize();
+    ROS_WARN("start thread has been terminated");
   }
 
   g_controller.cleanupPidFile();
-  return rv;
+  return 0;
 }
 
