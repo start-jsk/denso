@@ -428,7 +428,7 @@ public:
 
     if (failed_to_send_packet)
     {
-      fprintf(stderr, "roundtrip: %f\n", roundtrip);
+      ROS_WARN("  roundtrip: %f", roundtrip);
       setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
 
       // print the angle
@@ -478,7 +478,7 @@ public:
       // hr = bCapRobotExecute("stopLog", "");
       // if (FAILED(hr))
       // {
-      //   fprintf(stderr, "failed to disable logging mode\n");
+      //   ROS_WARN(failed to disable logging mode");
       // }
 
       hr = bCapMotor(false);
@@ -993,9 +993,8 @@ public:
 
   void quitRequest()
   {
-    fprintf(stderr, "DensoController::quitRequest\n");
+    ROS_INFO("request quit to denso controller");
     OpenController::quitRequest(); // call super class
-    fprintf(stderr, "DensoController::quitRequest called\n");
     ros::shutdown();
   }
 };
@@ -1004,7 +1003,7 @@ DensoController g_controller;
 void quitRequested(int sigint)
 {
   // do nothing
-  std::cerr << "quitRequested" << std::endl;
+  ROS_WARN("request quit to denso controller using signal");
   g_controller.quitRequest();
 }
 
