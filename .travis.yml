@@ -7,10 +7,14 @@ env:
     - USE_DEB=true  ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
     - USE_DEB=false ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros/ubuntu
     - USE_DEB=false ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
+    - USE_DEB=true  ROS_DISTRO="jade"   REPOSITORY=http://packages.ros.org/ros/ubuntu
+    - USE_DEB=true  ROS_DISTRO="jade"   REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
 matrix:
   allow_failures:
     - env: USE_DEB=true  ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros/ubuntu
     - env: USE_DEB=true  ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
+    - env: USE_DEB=true  ROS_DISTRO="jade"   REPOSITORY=http://packages.ros.org/ros/ubuntu
+    - env: USE_DEB=true  ROS_DISTRO="jade"   REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
 install:
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
