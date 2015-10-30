@@ -2,8 +2,8 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2015-10-30)
+------------------
 * update to indigo
 * Use arg for world file name
 * [vs060] use stl file instead of dae file in order to work on gazebo

@@ -2,8 +2,8 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2015-10-30)
+------------------
 * update to indigo
 
 0.2.9 (2015-03-07)
