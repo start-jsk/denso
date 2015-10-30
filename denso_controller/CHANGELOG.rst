@@ -2,8 +2,8 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2015-10-31)
+------------------
 * Fix stability issues by @ompugao
 
   * use macro inside recoverController basically
