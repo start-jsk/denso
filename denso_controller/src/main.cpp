@@ -201,6 +201,7 @@ public:
     var_handlers_.insert(std::map<std::string, u_int>::value_type("BUSY_STATUS",bCapControllerGetVariable("@BUSY_STATUS")));
     var_handlers_.insert(std::map<std::string, u_int>::value_type("CURRENT_TIME",bCapControllerGetVariable("@CURRENT_TIME")));
     var_handlers_.insert(std::map<std::string, u_int>::value_type("LOCK",bCapControllerGetVariable("@LOCK")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EMERGENCY_STOP",bCapControllerGetVariable("@EMERGENCY_STOP")));
 
     var_types_.insert(std::map<std::string, u_short>::value_type("ERROR_CODE", VT_I4));
     var_types_.insert(std::map<std::string, u_short>::value_type("MODE", VT_I4));
@@ -218,6 +219,7 @@ public:
     var_types_.insert(std::map<std::string, u_short>::value_type("BUSY_STATUS", VT_BOOL));
     var_types_.insert(std::map<std::string, u_short>::value_type("CURRENT_TIME", VT_DATE));
     var_types_.insert(std::map<std::string, u_short>::value_type("LOCK", VT_BOOL));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EMERGENCY_STOP", VT_BOOL));
   }
 
   u_int bCapControllerGetVariable(const std::string& varname)
@@ -242,6 +244,36 @@ public:
     return varresult;
   }
 
+  bool bCapGetBoolVariable(const std::string& var_name)
+  {
+    bool var = 0;
+    if( var_types_.find(var_name.c_str()) != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_[var_name.c_str()], &var);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get %s, return 0 instead.", var_name.c_str());
+        return 0;
+      }
+      return var;
+    }
+    ROS_WARN("No handler for %s, return 0 instead.", var_name.c_str());
+    return 0;
+  }
+
+  u_int bCapGetIntegerVariable(const std::string& var_name)
+  {
+    u_int var = 0;
+    if( var_types_.find(var_name.c_str()) != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_[var_name.c_str()], &var);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get %s, return 0 instead.", var_name.c_str());
+        return 0;
+      }
+      return var;
+    }
+    ROS_WARN("No handler for %s, return 0 instead.", var_name.c_str());
+    return 0;
+  }
+
   u_int __errorcode__;
   u_int bCapGetErrorCode()
   {
@@ -262,18 +294,12 @@ public:
   // 1: manual, 2: teachcheck, 3:auto
   u_int bCapGetMode()
   {
-    //u_int errorcode = 0; // this local variable is not allocated in debug mode...? why...
-    u_int mode = 0;
-    if( var_types_.find("MODE") != var_types_.end() ) {
-      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["MODE"], &mode);
-      if( FAILED(hr) ) {
-        ROS_WARN("Failed to get MODE, return 0 instead.");
-        return 0;
-      }
-      return mode;
-    }
-    ROS_WARN("No handler for MODE, return 0 instead.");
-    return 0;
+    return bCapGetIntegerVariable("MODE");
+  }
+
+  bool bCapGetEmergencyStop()
+  {
+    return bCapGetBoolVariable("EMERGENCY_STOP");
   }
 
   u_int bCapErrorDescription(std::string& errormsg)
