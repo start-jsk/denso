@@ -455,6 +455,29 @@ public:
     return hr;
   }
 
+  BCAP_HRESULT bCapFillBuffer()
+  {
+      BCAP_HRESULT hr;
+      std::vector<double> cur_jnt;
+      hr = bCapCurJnt(cur_jnt);
+      BCAP_VARIANT vntPose, vntResult;
+      vntPose.Type = VT_R8 | VT_ARRAY;
+      vntPose.Arrays = 8;
+      for (int i = 0; i < 8; i++)
+      {
+        vntPose.Value.DoubleArray[i] = cur_jnt[i];
+      }
+      // Fill the buffer for later use, 
+      // unless fill the buffer, bCap slave will fall down 
+      for (int i = 0; i < 4; i++) {
+          hr = bCapRobotSlvMove(&vntPose, &vntResult);
+          if (FAILED(hr)) {
+            ROS_WARN("result is %02x, failed", hr);
+            return hr;
+          }
+      }
+  }
+
   virtual void finalizeHW()
   {
     ROS_INFO("finalizeHW is called");
@@ -748,6 +771,11 @@ public:
       return CAST_STATUS(hr);
     }
 
+    if (errorcode == 0x84201482)
+    {
+      BCAP_HRESULT hr = bCapFillBuffer();
+      return CAST_STATUS(hr);
+    }
     if (errorcode == 0x84201486)
     {
         u_int mode;
@@ -954,27 +982,17 @@ public:
       }
 
       ROS_INFO("initialize bCap slave connection");
-      std::vector<double> cur_jnt;
-      hr = bCapCurJnt(cur_jnt);
-      BCAP_VARIANT vntPose, vntResult;
-      vntPose.Type = VT_R8 | VT_ARRAY;
-      vntPose.Arrays = 8;
-      for (int i = 0; i < 8; i++)
+      hr = bCapFillBuffer();
+      if (FAILED(hr))
       {
-        vntPose.Value.DoubleArray[i] = cur_jnt[i];
-      }
-      // Fill the buffer for later use, 
-      // unless fill the buffer, bCap slave will fall down 
-      for (int i = 0; i < 4; i++) {
-          hr = bCapRobotSlvMove(&vntPose, &vntResult);
-          if (FAILED(hr)) {
-            ROS_WARN("result is %02x, failed", hr);
-            SAFE_EXIT(1);
-          }
+        ROS_FATAL("failed to fill bcap buffer");
+        SAFE_EXIT(1);
       }
       ROS_INFO("bCap slave initialization done");
 
       // fill ac
+      std::vector<double> cur_jnt;
+      hr = bCapCurJnt(cur_jnt);
       int i = 0;
       for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
           it != cm_->model_.transmissions_.end(); ++it)
