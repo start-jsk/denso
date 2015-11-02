@@ -526,7 +526,7 @@ public:
     if (!dryrunp_)
     {
       setUDPTimeout(2, 0);
-      sleep(1);
+      boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
       long lResult;
       BCAP_HRESULT hr = BCAP_S_OK;
       //bCapClearError();
@@ -591,7 +591,7 @@ public:
       {
         ROS_INFO("successed to stop the service");
       }
-      sleep(1);
+      boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
       hr = bCap_Close(iSockFD_);
       if (FAILED(hr))
       {
@@ -821,18 +821,19 @@ public:
     if (errorcode == 0x84201486)
     {
         u_int mode;
+        boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
         while(!g_quit_)
         {
             mode = bCapGetMode();
             if (mode != 3) {
               // user set controller to manual or teachcheck mode, wait until the user set back to auto
               ROS_WARN("waiting until you set back to auto");
-              sleep(2);
+              boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
             } else {
               bool estop = bCapGetEmergencyStop();
               if (estop) {
                 ROS_WARN("please turn off emergency stop");
-                sleep(2);
+                boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
                 continue;
               } else {
                 break;
@@ -862,7 +863,7 @@ public:
           ROS_WARN("failed to get robot %02x", hr);
           return CAST_STATUS(hr);
         }
-        sleep(2);
+        boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
         hr = bCapTakearm();
         if (FAILED(hr)) {
           ROS_WARN("failed to take arm %02x", hr);
