@@ -504,6 +504,22 @@ public:
       }
   }
 
+  BCAP_HRESULT bCapReflectRealState() {
+      // fill ac
+      std::vector<double> cur_jnt;
+      BCAP_HRESULT hr;
+      hr = bCapCurJnt(cur_jnt);
+      int i = 0;
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
+      { // *** js and ac must be consistent
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
+        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
+        i++;
+      }
+      return hr;
+  }
+
   virtual void finalizeHW()
   {
     ROS_INFO("finalizeHW is called");
@@ -813,7 +829,14 @@ public:
               ROS_WARN("waiting until you set back to auto");
               sleep(2);
             } else {
-              break;
+              bool estop = bCapGetEmergencyStop();
+              if (estop) {
+                ROS_WARN("please turn off emergency stop");
+                sleep(2);
+                continue;
+              } else {
+                break;
+              }
             }
         }
         //TODO restart bcap server
@@ -828,11 +851,18 @@ public:
           ROS_WARN("failed to clear error %02x", hr);
           return CAST_STATUS(hr);
         }
+        BCAP_HRESULT lResult;
+        hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
+        if (FAILED(hr)) {
+          ROS_WARN("failed to give arm %02x", hr);
+          return CAST_STATUS(hr);
+        }
         hr = bCapGetRobot();
         if (FAILED(hr)) {
           ROS_WARN("failed to get robot %02x", hr);
           return CAST_STATUS(hr);
         }
+        sleep(2);
         hr = bCapTakearm();
         if (FAILED(hr)) {
           ROS_WARN("failed to take arm %02x", hr);
@@ -848,6 +878,16 @@ public:
           ROS_WARN("failed to change to slvmode %02x", hr);
           return CAST_STATUS(hr);
         }
+        hr = bCapFillBuffer();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to fill buffer in slave mode");
+          return CAST_STATUS(hr);
+        }
+        hr = bCapReflectRealState();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to reflect real state");
+          return CAST_STATUS(hr);
+        }
         return CAST_STATUS(BCAP_S_OK);
     }
     if (errorcode == 0x83500121)
@@ -861,9 +901,25 @@ public:
         ROS_WARN("failed to turn on motor, cannot recover");
         return CAST_STATUS(hr);
       }
+      hr = bCapRobotExecute("clearLog", "");
+      if (FAILED(hr)) {
+        ROS_WARN("failed to clear log");
+        return CAST_STATUS(hr);
+      }
       hr = bCapSlvChangeMode((char*)"514"); // 0x202
       if (FAILED(hr)) {
         ROS_WARN("failed to change slvmode, cannot recover");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapFillBuffer();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to fill buffer in slave mode");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapReflectRealState();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to reflect real state");
+        return CAST_STATUS(hr);
       }
       return CAST_STATUS(hr);
     }
@@ -1016,16 +1072,11 @@ public:
       }
       ROS_INFO("bCap slave initialization done");
 
-      // fill ac
-      std::vector<double> cur_jnt;
-      hr = bCapCurJnt(cur_jnt);
-      int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
-          it != cm_->model_.transmissions_.end(); ++it)
-      { // *** js and ac must be consistent
-        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
-        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
-        i++;
+      hr = bCapReflectRealState();
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to reflect real robot state into controller manager");
+        SAFE_EXIT(1);
       }
       setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
     }
