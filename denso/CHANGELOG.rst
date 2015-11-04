@@ -2,8 +2,8 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.1 (2015-11-03)
+------------------
 * [fix] Always run in a dryrun mode (fix `#62 <https://github.com/start-jsk/denso/issues/62>`_)
 * Contributors: Shohei Fujii
 
