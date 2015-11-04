@@ -632,6 +632,13 @@ public:
         //  }
         //}
       }
+    } else {
+      // always return a healthy status when it's running in dryurun mode
+      status.reset(new DensoControllerStatus(BCAP_S_OK));
+      for (size_t i = 0; i < 16; i++) {
+        vntReturn.Value.DoubleArray[i] = vntPose.Value.DoubleArray[i];
+      }
+
     }
 
     ROS_DEBUG("current angles(response): %f %f %f %f %f %f", vntReturn.Value.DoubleArray[0], vntReturn.Value.DoubleArray[1], vntReturn.Value.DoubleArray[2], vntReturn.Value.DoubleArray[3], vntReturn.Value.DoubleArray[4], vntReturn.Value.DoubleArray[5]);
