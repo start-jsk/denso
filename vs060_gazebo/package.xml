@@ -1,0 +1,22 @@
+<package>
+  <name>vs060_gazebo</name>
+  <version>0.0.1</version>
+  <description>The vs060_gazebo package</description>
+  
+  <author>Mahsa Parsapour</author>
+  <maintainer email="mahsa.parsapour@gmail.com">Mahsa Parsapour</maintainer>  
+
+  <license>BSD</license>
+  
+  <url type="bugtracker">https://github.com/MahsaP/gazebo_ros_denso/issues</url>
+  <url type="repository">https://github.com/MahsaP/gazebo_ros_denso</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>vs060</run_depend>
+  <run_depend>gazebo_ros</run_depend> 
+  <run_depend>controller_manager</run_depend>
+  
+  <export>
+  </export>
+</package>
