@@ -2,6 +2,11 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] Always run in a dryrun mode (fix `#62 <https://github.com/start-jsk/denso/issues/62>`_)
+* Contributors: Shohei Fujii
+
 1.1.0 (2015-10-31)
 ------------------
 * Fix stability issues by @ompugao
