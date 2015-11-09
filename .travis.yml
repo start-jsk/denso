@@ -37,6 +37,8 @@ script:
   - catkin build --limit-status-rate 0.1 --no-notify
   # Run tests
   - catkin run_tests
+  # check test (this only works on indigo)
+  - catkin_test_results build
   ### INSTALL
   - catkin clean -a
   # Enable install space
