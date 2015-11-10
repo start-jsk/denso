@@ -11,8 +11,8 @@ env:
     - USE_DEB=true  ROS_DISTRO="jade"   REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
 matrix:
   allow_failures:
-    - env: USE_DEB=true  ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros/ubuntu
-    - env: USE_DEB=true  ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
+    - env: USE_DEB=false  ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros/ubuntu
+    - env: USE_DEB=false  ROS_DISTRO="indigo" REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
     - env: USE_DEB=true  ROS_DISTRO="jade"   REPOSITORY=http://packages.ros.org/ros/ubuntu
     - env: USE_DEB=true  ROS_DISTRO="jade"   REPOSITORY=http://packages.ros.org/ros-shadow-fixed/ubuntu
 install:
@@ -49,3 +49,5 @@ script:
   - catkin build --limit-status-rate 0.1 --no-notify --make-args tests
   # Run tests
   - catkin run_tests
+  # check test (this only works on indigo)
+  - catkin_test_results build
