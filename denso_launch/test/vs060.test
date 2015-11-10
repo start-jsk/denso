@@ -1,0 +1,17 @@
+<launch>
+  <include file="$(find vs060_moveit_config)/launch/demo_simulation_noenvironment.launch">
+     <arg name="use_rviz" value="false" />  <!-- RViz/GUI is not needed for the tests -->
+  </include>
+  
+  <!-- Check if MoveGroup is running -->
+  <param name="test_move_group/topic" value="/move_group/status" />
+  <param name="test_move_group/hz" value="5.0" />
+  <param name="test_move_group/hzerror" value="0.25" />
+  <param name="test_move_group/test_duration" value="5.0" />
+  <param name="test_move_group/wait_time" value="30.0" />
+  <test pkg="rostest" type="hztest" test-name="test_move_group" name="test_move_group" time-limit="60"/>
+  
+  <test pkg="denso_launch" type="test_moveit.py" test-name="test_moveit_py" time-limit="60" retry="1" args="" />
+
+  <test test-name="denso_vs060_moveit_demo_test" pkg="denso_launch" type="denso_vs060_moveit_demo_test.py" />
+</launch>

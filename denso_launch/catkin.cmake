@@ -13,6 +13,4 @@ catkin_package(
 
 install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-add_rostest(launch/denso_vs060_moveit_demo_simulation.launch)
-
-
+add_rostest(test/vs060.test)
