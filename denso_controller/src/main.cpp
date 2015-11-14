@@ -136,11 +136,25 @@ public:
     return hr;
   }
 
+  BCAP_HRESULT bCapClose()
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    hr = bCap_Close(iSockFD_);
+    return hr;
+  }
+
   BCAP_HRESULT bCapControllerConnect()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     hr = bCap_ControllerConnect(iSockFD_, (char*)"", (char*)"caoProv.DENSO.VRC", (char*)(server_ip_address_.c_str()), (char*)"",
                                 &lhController_);
+    return hr;
+  }
+
+  BCAP_HRESULT bCapControllerDisConnect()
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    hr = bCap_ControllerDisconnect(iSockFD_, lhController_);
     return hr;
   }
 
@@ -161,6 +175,12 @@ public:
     ROS_INFO("GetRobot %02x %02x", hr, lhRobot_);
     return hr;
   }
+  BCAP_HRESULT bCapReleaseRobot()
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
+    return hr;
+  }
 
   BCAP_HRESULT bCapRobotExecute(char* command, char* arg)
   {
@@ -173,6 +193,14 @@ public:
   BCAP_HRESULT bCapTakearm()
   {
     BCAP_HRESULT hr = bCapRobotExecute("Takearm", "");
+    return hr;
+  }
+
+  BCAP_HRESULT bCapGiveArm()
+  {
+    BCAP_VARIANT lResult;
+    BCAP_HRESULT hr;
+    hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
     return hr;
   }
 
@@ -483,6 +511,7 @@ public:
 
   BCAP_HRESULT bCapFillBuffer()
   {
+      ROS_WARN("try to fill buffer");
       BCAP_HRESULT hr;
       std::vector<double> cur_jnt;
       hr = bCapCurJnt(cur_jnt);
@@ -498,7 +527,6 @@ public:
       for (int i = 0; i < 4; i++) {
           hr = bCapRobotSlvMove(&vntPose, &vntResult);
           if (FAILED(hr)) {
-            ROS_WARN("result is %02x, failed", hr);
             return hr;
           }
       }
@@ -554,7 +582,7 @@ public:
       {
         ROS_INFO("successed to motor off");
       }
-      hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
+      hr = bCapGiveArm();
       if (FAILED(hr))
       {
         ROS_WARN("failed to give arm");
@@ -563,7 +591,7 @@ public:
       {
         ROS_INFO("successed to give arm");
       }
-      hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
+      hr = bCapReleaseRobot();
       if (FAILED(hr))
       {
         ROS_WARN("failed to release the robot");
@@ -572,7 +600,7 @@ public:
       {
         ROS_INFO( "successed to release the robot");
       }
-      hr = bCap_ControllerDisconnect(iSockFD_, lhController_);
+      hr = bCapControllerDisConnect();
       if (FAILED(hr))
       {
         ROS_WARN("failed to disconnect from the controller");
@@ -582,7 +610,7 @@ public:
         ROS_INFO("successed to disconnect from the controller");
       }
       /* Stop b-CAP service (Very important in UDP/IP connection) */
-      hr = bCap_ServiceStop(iSockFD_);
+      hr = bCapServerStop();
       if (FAILED(hr))
       {
         ROS_WARN("failed to stop the service");
@@ -592,7 +620,7 @@ public:
         ROS_INFO("successed to stop the service");
       }
       boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-      hr = bCap_Close(iSockFD_);
+      hr = bCapClose();
       if (FAILED(hr))
       {
         ROS_WARN("failed to close bCap");
@@ -672,7 +700,7 @@ public:
       ROS_DEBUG("updateJoints hr: %02x", hr);
       if (hr == 0xF200501)
       {
-        //ROS_INFO("buf is filled, it's fine.");
+        ROS_DEBUG("buf is filled, it's fine.");
         status.reset(new DensoControllerStatus(BCAP_S_OK));
       }
       else if (FAILED(hr))
@@ -681,7 +709,7 @@ public:
       }
       else
       {
-        status.reset(new DensoControllerStatus(BCAP_S_OK));
+        //status.reset(new DensoControllerStatus(BCAP_S_OK));
         //while (hr == 0 && g_halt_requested_ == false)
         //{
         //  // 0 means that there is an empty buffer
@@ -696,6 +724,7 @@ public:
         //    ROS_WARN("buf is filled");
         //  }
         //}
+        status.reset(new DensoControllerStatus(hr));
       }
     } else {
       // always return a healthy status when it's running in dryurun mode
@@ -778,6 +807,27 @@ public:
           ROS_WARN("failed to clear error %02x", hr);
           return CAST_STATUS(hr);
       }
+      hr = bCapGiveArm();
+      if (FAILED(hr)) {
+          ROS_WARN("failed to give arm %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      //hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
+      //if (FAILED(hr))
+      //{
+      //  ROS_WARN("failed to release the robot");
+      //}
+      //hr = bCapGetRobot();
+      //if (FAILED(hr)) {
+      //    ROS_WARN("failed to get robot %02x", hr);
+      //    return CAST_STATUS(hr);
+      //}
+      boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+      hr = bCapTakearm();
+      if (FAILED(hr)) {
+          ROS_WARN("failed to take arm %02x", hr);
+          return CAST_STATUS(hr);
+      }
       hr = bCapMotor(true);
       if (FAILED(hr)) {
           ROS_WARN("failed to turn on motor %02x", hr);
@@ -815,9 +865,107 @@ public:
 
     if (errorcode == 0x84201482)
     {
-      BCAP_HRESULT hr = bCapFillBuffer();
+      // error: postion buffer is empty.
+      //BCAP_HRESULT hr = bCapFillBuffer(); // this does not work
+      // now completely restart bcap things
+      BCAP_HRESULT hr;
+      hr = bCapMotor(false);
+      if (FAILED(hr)) {
+        ROS_WARN("failed to turn off motor %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapGiveArm();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to give arm %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapReleaseRobot();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to release robot %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapControllerDisConnect();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to disconnect controller %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapServerStop();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to stop bcap service %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+      hr = bCapClose();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to close bcap socket %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapOpen();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to open socket %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      setUDPTimeout(2, 0); // 2000msec
+      hr = bCapServerStart();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to start service %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapControllerConnect();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to connect controller %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapClearError();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to clear error %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapGetRobot();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to get robot %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapTakearm();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to take arm %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapMotor(true);
+      if (FAILED(hr))
+      {
+        ROS_WARN("failed to turn on motor %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapRobotExecute("clearLog", "");
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to clear logging");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to change slave mode");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapFillBuffer();
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to fill bcap buffer");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapReflectRealState();
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to reflect real robot state into controller manager");
+        return CAST_STATUS(hr);
+      }
+      setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
+
       return CAST_STATUS(hr);
     }
+
     if (errorcode == 0x84201486)
     {
         u_int mode;
@@ -852,8 +1000,7 @@ public:
           ROS_WARN("failed to clear error %02x", hr);
           return CAST_STATUS(hr);
         }
-        BCAP_HRESULT lResult;
-        hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
+        hr = bCapGiveArm();
         if (FAILED(hr)) {
           ROS_WARN("failed to give arm %02x", hr);
           return CAST_STATUS(hr);
@@ -965,6 +1112,11 @@ public:
     BCAP_HRESULT hr = bCap_ServiceStart(iSockFD_); /* Start b-CAP service */
     return hr;
   }
+  BCAP_HRESULT bCapServerStop()
+  {
+    BCAP_HRESULT hr = bCap_ServiceStop(iSockFD_); /* Start b-CAP service */
+    return hr;
+  }
 
   /**
    * @overridden
@@ -1036,13 +1188,11 @@ public:
       }
 
       // enable logging
+      hr = bCapRobotExecute("clearLog", "");
+      if (FAILED(hr))
       {
-        BCAP_HRESULT hr = bCapRobotExecute("clearLog", "");
-        if (FAILED(hr))
-        {
-          ROS_FATAL("failed to enable logging mode");
-          SAFE_EXIT(1);
-        }
+        ROS_FATAL("failed to enable logging mode");
+        SAFE_EXIT(1);
       }
 
       // enable logging
@@ -1054,14 +1204,12 @@ public:
       //   }
       // }
 
+      hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      //BCAP_HRESULT hr = bCapSlvChangeMode((char*)"258"); // 0x102
+      if (FAILED(hr))
       {
-        BCAP_HRESULT hr = bCapSlvChangeMode((char*)"514"); // 0x202
-        //BCAP_HRESULT hr = bCapSlvChangeMode((char*)"258"); // 0x102
-        if (FAILED(hr))
-        {
-          ROS_FATAL("failed to change slave mode");
-          SAFE_EXIT(1);
-        }
+        ROS_FATAL("failed to change slave mode");
+        SAFE_EXIT(1);
       }
 
       ROS_INFO("initialize bCap slave connection");
@@ -1100,19 +1248,19 @@ public:
       server_port_number_ = DEFAULT_SERVER_PORT_NUM;
     }
 
-    ROS_WARN("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
+    ROS_INFO("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
 
     // Determine the pre-set UDP timeout length.
     if (!node.getParam("udp_timeout", udp_timeout_))
     {
       udp_timeout_ = DEFAULT_UDP_TIMEOUT;
     }
-    ROS_WARN("udp_timeout: %d micro sec", udp_timeout_);
+    ROS_INFO("udp_timeout: %d micro sec", udp_timeout_);
   }
 
   void quitRequest()
   {
-    ROS_INFO("request quit to denso controller");
+    ROS_INFO("denso_controller received a quit request");
     OpenController::quitRequest(); // call super class
     ros::shutdown();
   }
