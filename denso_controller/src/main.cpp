@@ -97,6 +97,8 @@ public:
   DensoController() :
       OpenControllersInterface::OpenController()
   {
+    prev_angle_.resize(6);
+    prev_vel_.resize(6);
   }
 #define SAFE_EXIT(exit_code) {                  \
     ROS_FATAL("fatal error has occurred");      \
@@ -504,8 +506,11 @@ public:
     }
 
     // memoize prev angle
-    prev_angle_ = current_angle;
-    prev_vel_ = current_vel;
+    for (size_t i = 0; i < 6; i++) {
+        prev_angle_.at(i) = current_angle.at(i);
+        prev_vel_.at(i) = current_vel.at(i);
+        
+    }
     return hr;
   }
 
@@ -677,8 +682,9 @@ public:
         i++;
       }
     }
-    ROS_DEBUG("target angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
-          
+    ROS_DEBUG("target  angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
+    vntPose.Value.DoubleArray[6] = 0;
+    vntPose.Value.DoubleArray[7] = 0;
     // send vntPose
     DensoControllerStatusPtr status;
     BCAP_VARIANT vntReturn;
@@ -735,7 +741,7 @@ public:
 
     }
 
-    ROS_DEBUG("current angles(response): %f %f %f %f %f %f", vntReturn.Value.DoubleArray[0], vntReturn.Value.DoubleArray[1], vntReturn.Value.DoubleArray[2], vntReturn.Value.DoubleArray[3], vntReturn.Value.DoubleArray[4], vntReturn.Value.DoubleArray[5]);
+    ROS_DEBUG("current angles: %f %f %f %f %f %f", vntReturn.Value.DoubleArray[0], vntReturn.Value.DoubleArray[1], vntReturn.Value.DoubleArray[2], vntReturn.Value.DoubleArray[3], vntReturn.Value.DoubleArray[4], vntReturn.Value.DoubleArray[5]);
     hw_->current_time_ = ros::Time::now(); // ???
     {
       int i = 0;
@@ -744,7 +750,7 @@ public:
       { // *** js and ac must be consistent
         pr2_mechanism_model::JointState *js = cm_->state_->getJointState((*it)->joint_names_[0]);
         pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
-        ac->state_.velocity_ = 0;
+        ac->state_.velocity_ = DEG2RAD(prev_vel_.at(i));
         if (!dryrunp_)
         { // if not in the dryrun mode, we just copy the vntReturn value
           ac->state_.position_ = DEG2RAD(vntReturn.Value.DoubleArray[i]);
