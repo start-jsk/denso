@@ -97,6 +97,8 @@ public:
   DensoController() :
       OpenControllersInterface::OpenController()
   {
+    prev_angle_.resize(6);
+    prev_vel_.resize(6);
   }
 #define SAFE_EXIT(exit_code) {                  \
     ROS_FATAL("fatal error has occurred");      \
@@ -136,11 +138,25 @@ public:
     return hr;
   }
 
+  BCAP_HRESULT bCapClose()
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    hr = bCap_Close(iSockFD_);
+    return hr;
+  }
+
   BCAP_HRESULT bCapControllerConnect()
   {
     BCAP_HRESULT hr = BCAP_S_OK;
     hr = bCap_ControllerConnect(iSockFD_, (char*)"", (char*)"caoProv.DENSO.VRC", (char*)(server_ip_address_.c_str()), (char*)"",
                                 &lhController_);
+    return hr;
+  }
+
+  BCAP_HRESULT bCapControllerDisConnect()
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    hr = bCap_ControllerDisconnect(iSockFD_, lhController_);
     return hr;
   }
 
@@ -161,6 +177,12 @@ public:
     ROS_INFO("GetRobot %02x %02x", hr, lhRobot_);
     return hr;
   }
+  BCAP_HRESULT bCapReleaseRobot()
+  {
+    BCAP_HRESULT hr = BCAP_S_OK;
+    hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
+    return hr;
+  }
 
   BCAP_HRESULT bCapRobotExecute(char* command, char* arg)
   {
@@ -172,13 +194,39 @@ public:
 
   BCAP_HRESULT bCapTakearm()
   {
-    BCAP_HRESULT hr = bCapRobotExecute("Takearm", "");
+    BCAP_VARIANT takearmparam, takearmresult;
+    takearmparam.Type = VT_I4 | VT_ARRAY;
+    takearmparam.Arrays = 2;
+    ((u_int*)(&takearmparam.Value.LongValue))[0] = 0;
+    ((u_int*)(&takearmparam.Value.LongValue))[1] = 1;
+    BCAP_HRESULT hr;
+    //hr = bCap_RobotExecute(iSockFD_, lhRobot_, "Takearm", takearmparam, &takearmresult);
+    hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "Takearm", &takearmparam, &takearmresult);
+    //BCAP_HRESULT hr = bCapRobotExecute("Takearm", "");
     return hr;
   }
 
-  BCAP_HRESULT bCapSetExternalSpeed(char* arg)
+  BCAP_HRESULT bCapGiveArm()
   {
-    BCAP_HRESULT hr = bCapRobotExecute("ExtSpeed", arg);
+    BCAP_VARIANT lResult;
+    BCAP_HRESULT hr;
+    hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
+    return hr;
+  }
+
+  BCAP_HRESULT bCapSetExternalSpeed(float arg)
+  {
+    BCAP_HRESULT hr;
+    BCAP_VARIANT extspeedparam, extspeedresult;
+    extspeedparam.Type = VT_R4 | VT_ARRAY;
+    extspeedparam.Arrays = 1;
+    extspeedparam.Value.FloatValue = arg;
+    //((u_int*)(&extspeedparam.Value.LongValue))[1] = 0;
+    //((u_int*)(&extspeedparam.Value.LongValue))[2] = 0;
+    //hr = bCap_RobotExecute(iSockFD_, lhRobot_, "ExtSpeed", (char*)"80.0", &lResult);
+    hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "ExtSpeed", &extspeedparam, &extspeedresult);
+
+    //BCAP_HRESULT hr = bCapRobotExecute("ExtSpeed", arg);
     return hr;
   }
 
@@ -201,6 +249,7 @@ public:
     var_handlers_.insert(std::map<std::string, u_int>::value_type("BUSY_STATUS",bCapControllerGetVariable("@BUSY_STATUS")));
     var_handlers_.insert(std::map<std::string, u_int>::value_type("CURRENT_TIME",bCapControllerGetVariable("@CURRENT_TIME")));
     var_handlers_.insert(std::map<std::string, u_int>::value_type("LOCK",bCapControllerGetVariable("@LOCK")));
+    var_handlers_.insert(std::map<std::string, u_int>::value_type("EMERGENCY_STOP",bCapControllerGetVariable("@EMERGENCY_STOP")));
 
     var_types_.insert(std::map<std::string, u_short>::value_type("ERROR_CODE", VT_I4));
     var_types_.insert(std::map<std::string, u_short>::value_type("MODE", VT_I4));
@@ -218,6 +267,7 @@ public:
     var_types_.insert(std::map<std::string, u_short>::value_type("BUSY_STATUS", VT_BOOL));
     var_types_.insert(std::map<std::string, u_short>::value_type("CURRENT_TIME", VT_DATE));
     var_types_.insert(std::map<std::string, u_short>::value_type("LOCK", VT_BOOL));
+    var_types_.insert(std::map<std::string, u_short>::value_type("EMERGENCY_STOP", VT_BOOL));
   }
 
   u_int bCapControllerGetVariable(const std::string& varname)
@@ -242,6 +292,36 @@ public:
     return varresult;
   }
 
+  bool bCapGetBoolVariable(const std::string& var_name)
+  {
+    bool var = 0;
+    if( var_types_.find(var_name.c_str()) != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_[var_name.c_str()], &var);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get %s, return 0 instead.", var_name.c_str());
+        return 0;
+      }
+      return var;
+    }
+    ROS_WARN("No handler for %s, return 0 instead.", var_name.c_str());
+    return 0;
+  }
+
+  u_int bCapGetIntegerVariable(const std::string& var_name)
+  {
+    u_int var = 0;
+    if( var_types_.find(var_name.c_str()) != var_types_.end() ) {
+      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_[var_name.c_str()], &var);
+      if( FAILED(hr) ) {
+        ROS_WARN("Failed to get %s, return 0 instead.", var_name.c_str());
+        return 0;
+      }
+      return var;
+    }
+    ROS_WARN("No handler for %s, return 0 instead.", var_name.c_str());
+    return 0;
+  }
+
   u_int __errorcode__;
   u_int bCapGetErrorCode()
   {
@@ -262,18 +342,12 @@ public:
   // 1: manual, 2: teachcheck, 3:auto
   u_int bCapGetMode()
   {
-    //u_int errorcode = 0; // this local variable is not allocated in debug mode...? why...
-    u_int mode = 0;
-    if( var_types_.find("MODE") != var_types_.end() ) {
-      BCAP_HRESULT hr = bCap_VariableGetValue(iSockFD_, var_handlers_["MODE"], &mode);
-      if( FAILED(hr) ) {
-        ROS_WARN("Failed to get MODE, return 0 instead.");
-        return 0;
-      }
-      return mode;
-    }
-    ROS_WARN("No handler for MODE, return 0 instead.");
-    return 0;
+    return bCapGetIntegerVariable("MODE");
+  }
+
+  bool bCapGetEmergencyStop()
+  {
+    return bCapGetBoolVariable("EMERGENCY_STOP");
   }
 
   u_int bCapErrorDescription(std::string& errormsg)
@@ -307,13 +381,24 @@ public:
   BCAP_HRESULT bCapMotor(bool command)
   {
     BCAP_HRESULT hr = BCAP_S_OK;
+    BCAP_VARIANT motorarmparam, motorarmresult;
+    motorarmparam.Type = VT_I4 | VT_ARRAY;
+    motorarmparam.Arrays = 2;
     if (command)
     {
-      hr = bCapRobotExecute("Motor", "1");
+      //hr = bCapRobotExecute("Motor", "1");
+      ((u_int*)(&motorarmparam.Value.LongValue))[0] = 1;
+      ((u_int*)(&motorarmparam.Value.LongValue))[1] = 0;
+
+      hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "Motor", &motorarmparam, &motorarmresult);
     }
     else
     {
-      hr = bCapRobotExecute("Motor", "0");
+      //hr = bCapRobotExecute("Motor", "0");
+      ((u_int*)(&motorarmparam.Value.LongValue))[0] = 0;
+      ((u_int*)(&motorarmparam.Value.LongValue))[1] = 1;
+
+      hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "Motor", &motorarmparam, &motorarmresult);
     }
     return hr;
   }
@@ -326,11 +411,17 @@ public:
     return hr;
   }
 
-  BCAP_HRESULT bCapSlvChangeMode(char* arg)
+  BCAP_HRESULT bCapSlvChangeMode(u_int arg)
   {
-    long lResult;
-    BCAP_HRESULT hr = bCap_RobotExecute(iSockFD_, lhRobot_, "slvChangeMode", arg, &lResult);
-    ROS_INFO("change slave mode: hr: %02x, result: %02x", hr, lResult);
+    //long lResult;
+    //BCAP_HRESULT hr = bCap_RobotExecute(iSockFD_, lhRobot_, "slvChangeMode", arg, &lResult);
+    BCAP_HRESULT hr;
+    BCAP_VARIANT slvchangeparam, slvchangeresult;
+    slvchangeparam.Type = VT_I4;
+    slvchangeparam.Arrays = 1;
+    slvchangeparam.Value.LongValue = arg;
+    hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "slvChangeMode", &slvchangeparam, &slvchangeresult);
+    //ROS_INFO("change slave mode: hr: %02x, result: %02x", hr, slvchangeresult);
     return hr;
   }
 
@@ -450,9 +541,51 @@ public:
     }
 
     // memoize prev angle
-    prev_angle_ = current_angle;
-    prev_vel_ = current_vel;
+    for (size_t i = 0; i < 6; i++) {
+        prev_angle_.at(i) = current_angle.at(i);
+        prev_vel_.at(i) = current_vel.at(i);
+        
+    }
     return hr;
+  }
+
+  BCAP_HRESULT bCapFillBuffer()
+  {
+      ROS_WARN("try to fill buffer");
+      BCAP_HRESULT hr;
+      std::vector<double> cur_jnt;
+      hr = bCapCurJnt(cur_jnt);
+      BCAP_VARIANT vntPose, vntResult;
+      vntPose.Type = VT_R8 | VT_ARRAY;
+      vntPose.Arrays = 8;
+      for (int i = 0; i < 8; i++)
+      {
+        vntPose.Value.DoubleArray[i] = cur_jnt[i];
+      }
+      // Fill the buffer for later use, 
+      // unless fill the buffer, bCap slave will fall down 
+      for (int i = 0; i < 4; i++) {
+          hr = bCapRobotSlvMove(&vntPose, &vntResult);
+          if (FAILED(hr)) {
+            return hr;
+          }
+      }
+  }
+
+  BCAP_HRESULT bCapReflectRealState() {
+      // fill ac
+      std::vector<double> cur_jnt;
+      BCAP_HRESULT hr;
+      hr = bCapCurJnt(cur_jnt);
+      int i = 0;
+      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
+          it != cm_->model_.transmissions_.end(); ++it)
+      { // *** js and ac must be consistent
+        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
+        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
+        i++;
+      }
+      return hr;
   }
 
   virtual void finalizeHW()
@@ -461,12 +594,12 @@ public:
     if (!dryrunp_)
     {
       setUDPTimeout(2, 0);
-      sleep(1);
+      boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
       long lResult;
       BCAP_HRESULT hr = BCAP_S_OK;
       //bCapClearError();
 
-      hr = bCapSlvChangeMode((char*)"0");
+      hr = bCapSlvChangeMode(0);
       if (FAILED(hr))
       {
         ROS_WARN("failed to change slave mode");
@@ -489,7 +622,7 @@ public:
       {
         ROS_INFO("successed to motor off");
       }
-      hr = bCap_RobotExecute(iSockFD_, lhRobot_, (char*)"Givearm", (char*)"", &lResult);
+      hr = bCapGiveArm();
       if (FAILED(hr))
       {
         ROS_WARN("failed to give arm");
@@ -498,7 +631,7 @@ public:
       {
         ROS_INFO("successed to give arm");
       }
-      hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
+      hr = bCapReleaseRobot();
       if (FAILED(hr))
       {
         ROS_WARN("failed to release the robot");
@@ -507,7 +640,7 @@ public:
       {
         ROS_INFO( "successed to release the robot");
       }
-      hr = bCap_ControllerDisconnect(iSockFD_, lhController_);
+      hr = bCapControllerDisConnect();
       if (FAILED(hr))
       {
         ROS_WARN("failed to disconnect from the controller");
@@ -517,7 +650,7 @@ public:
         ROS_INFO("successed to disconnect from the controller");
       }
       /* Stop b-CAP service (Very important in UDP/IP connection) */
-      hr = bCap_ServiceStop(iSockFD_);
+      hr = bCapServerStop();
       if (FAILED(hr))
       {
         ROS_WARN("failed to stop the service");
@@ -526,8 +659,8 @@ public:
       {
         ROS_INFO("successed to stop the service");
       }
-      sleep(1);
-      hr = bCap_Close(iSockFD_);
+      boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+      hr = bCapClose();
       if (FAILED(hr))
       {
         ROS_WARN("failed to close bCap");
@@ -584,8 +717,9 @@ public:
         i++;
       }
     }
-    ROS_DEBUG("target angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
-          
+    ROS_DEBUG("target  angles: %f %f %f %f %f %f", vntPose.Value.DoubleArray[0], vntPose.Value.DoubleArray[1], vntPose.Value.DoubleArray[2], vntPose.Value.DoubleArray[3], vntPose.Value.DoubleArray[4], vntPose.Value.DoubleArray[5]);
+    vntPose.Value.DoubleArray[6] = 0;
+    vntPose.Value.DoubleArray[7] = 0;
     // send vntPose
     DensoControllerStatusPtr status;
     BCAP_VARIANT vntReturn;
@@ -607,7 +741,7 @@ public:
       ROS_DEBUG("updateJoints hr: %02x", hr);
       if (hr == 0xF200501)
       {
-        //ROS_INFO("buf is filled, it's fine.");
+        ROS_DEBUG("buf is filled, it's fine.");
         status.reset(new DensoControllerStatus(BCAP_S_OK));
       }
       else if (FAILED(hr))
@@ -616,7 +750,7 @@ public:
       }
       else
       {
-        status.reset(new DensoControllerStatus(BCAP_S_OK));
+        //status.reset(new DensoControllerStatus(BCAP_S_OK));
         //while (hr == 0 && g_halt_requested_ == false)
         //{
         //  // 0 means that there is an empty buffer
@@ -631,6 +765,7 @@ public:
         //    ROS_WARN("buf is filled");
         //  }
         //}
+        status.reset(new DensoControllerStatus(hr));
       }
     } else {
       // always return a healthy status when it's running in dryurun mode
@@ -641,7 +776,7 @@ public:
 
     }
 
-    ROS_DEBUG("current angles(response): %f %f %f %f %f %f", vntReturn.Value.DoubleArray[0], vntReturn.Value.DoubleArray[1], vntReturn.Value.DoubleArray[2], vntReturn.Value.DoubleArray[3], vntReturn.Value.DoubleArray[4], vntReturn.Value.DoubleArray[5]);
+    ROS_DEBUG("current angles: %f %f %f %f %f %f", vntReturn.Value.DoubleArray[0], vntReturn.Value.DoubleArray[1], vntReturn.Value.DoubleArray[2], vntReturn.Value.DoubleArray[3], vntReturn.Value.DoubleArray[4], vntReturn.Value.DoubleArray[5]);
     hw_->current_time_ = ros::Time::now(); // ???
     {
       int i = 0;
@@ -650,7 +785,7 @@ public:
       { // *** js and ac must be consistent
         pr2_mechanism_model::JointState *js = cm_->state_->getJointState((*it)->joint_names_[0]);
         pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
-        ac->state_.velocity_ = 0;
+        ac->state_.velocity_ = DEG2RAD(prev_vel_.at(i));
         if (!dryrunp_)
         { // if not in the dryrun mode, we just copy the vntReturn value
           ac->state_.position_ = DEG2RAD(vntReturn.Value.DoubleArray[i]);
@@ -713,12 +848,33 @@ public:
           ROS_WARN("failed to clear error %02x", hr);
           return CAST_STATUS(hr);
       }
+      hr = bCapGiveArm();
+      if (FAILED(hr)) {
+          ROS_WARN("failed to give arm %02x", hr);
+          return CAST_STATUS(hr);
+      }
+      //hr = bCap_RobotRelease(iSockFD_, lhRobot_); /* Release robot handle */
+      //if (FAILED(hr))
+      //{
+      //  ROS_WARN("failed to release the robot");
+      //}
+      //hr = bCapGetRobot();
+      //if (FAILED(hr)) {
+      //    ROS_WARN("failed to get robot %02x", hr);
+      //    return CAST_STATUS(hr);
+      //}
+      boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+      hr = bCapTakearm();
+      if (FAILED(hr)) {
+          ROS_WARN("failed to take arm %02x", hr);
+          return CAST_STATUS(hr);
+      }
       hr = bCapMotor(true);
       if (FAILED(hr)) {
           ROS_WARN("failed to turn on motor %02x", hr);
           return CAST_STATUS(hr);
       }
-      hr = bCapSlvChangeMode((char*)"514");
+      hr = bCapSlvChangeMode(0x202);
       if (FAILED(hr)) {
           ROS_WARN("failed to change to slvmode %02x", hr);
           return CAST_STATUS(hr);
@@ -748,18 +904,129 @@ public:
       return CAST_STATUS(hr);
     }
 
+    if (errorcode == 0x84201482)
+    {
+      // error: postion buffer is empty.
+      //BCAP_HRESULT hr = bCapFillBuffer(); // this does not work
+      // now completely restart bcap things
+      BCAP_HRESULT hr;
+      hr = bCapMotor(false);
+      if (FAILED(hr)) {
+        ROS_WARN("failed to turn off motor %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapGiveArm();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to give arm %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapReleaseRobot();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to release robot %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapControllerDisConnect();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to disconnect controller %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapServerStop();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to stop bcap service %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+      hr = bCapClose();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to close bcap socket %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapOpen();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to open socket %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      setUDPTimeout(2, 0); // 2000msec
+      hr = bCapServerStart();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to start service %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapControllerConnect();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to connect controller %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapClearError();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to clear error %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapGetRobot();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to get robot %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapTakearm();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to take arm %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapMotor(true);
+      if (FAILED(hr))
+      {
+        ROS_WARN("failed to turn on motor %02x", hr);
+        return CAST_STATUS(hr);
+      }
+      hr = bCapRobotExecute("clearLog", "");
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to clear logging");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapSlvChangeMode(0x202);
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to change slave mode");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapFillBuffer();
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to fill bcap buffer");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapReflectRealState();
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to reflect real robot state into controller manager");
+        return CAST_STATUS(hr);
+      }
+      setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
+
+      return CAST_STATUS(hr);
+    }
+
     if (errorcode == 0x84201486)
     {
         u_int mode;
+        boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
         while(!g_quit_)
         {
             mode = bCapGetMode();
             if (mode != 3) {
               // user set controller to manual or teachcheck mode, wait until the user set back to auto
               ROS_WARN("waiting until you set back to auto");
-              sleep(2);
+              boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
             } else {
-              break;
+              bool estop = bCapGetEmergencyStop();
+              if (estop) {
+                ROS_WARN("please turn off emergency stop");
+                boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+                continue;
+              } else {
+                break;
+              }
             }
         }
         //TODO restart bcap server
@@ -774,11 +1041,17 @@ public:
           ROS_WARN("failed to clear error %02x", hr);
           return CAST_STATUS(hr);
         }
+        hr = bCapGiveArm();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to give arm %02x", hr);
+          return CAST_STATUS(hr);
+        }
         hr = bCapGetRobot();
         if (FAILED(hr)) {
           ROS_WARN("failed to get robot %02x", hr);
           return CAST_STATUS(hr);
         }
+        boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
         hr = bCapTakearm();
         if (FAILED(hr)) {
           ROS_WARN("failed to take arm %02x", hr);
@@ -789,9 +1062,19 @@ public:
           ROS_WARN("failed to turn on motor %02x", hr);
           return CAST_STATUS(hr);
         }
-        hr = bCapSlvChangeMode((char*)"514");
+        hr = bCapSlvChangeMode(0x202);
         if (FAILED(hr)) {
           ROS_WARN("failed to change to slvmode %02x", hr);
+          return CAST_STATUS(hr);
+        }
+        hr = bCapFillBuffer();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to fill buffer in slave mode");
+          return CAST_STATUS(hr);
+        }
+        hr = bCapReflectRealState();
+        if (FAILED(hr)) {
+          ROS_WARN("failed to reflect real state");
           return CAST_STATUS(hr);
         }
         return CAST_STATUS(BCAP_S_OK);
@@ -807,9 +1090,25 @@ public:
         ROS_WARN("failed to turn on motor, cannot recover");
         return CAST_STATUS(hr);
       }
-      hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      hr = bCapRobotExecute("clearLog", "");
+      if (FAILED(hr)) {
+        ROS_WARN("failed to clear log");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapSlvChangeMode(0x202);
       if (FAILED(hr)) {
         ROS_WARN("failed to change slvmode, cannot recover");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapFillBuffer();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to fill buffer in slave mode");
+        return CAST_STATUS(hr);
+      }
+      hr = bCapReflectRealState();
+      if (FAILED(hr)) {
+        ROS_WARN("failed to reflect real state");
+        return CAST_STATUS(hr);
       }
       return CAST_STATUS(hr);
     }
@@ -817,7 +1116,7 @@ public:
     {
       //TODO rethink the way to recover
       ROS_INFO("invalid command when the robot is in slave mode, disable slave mode");
-      BCAP_HRESULT hr = bCapSlvChangeMode((char*)"0"); // 0x202
+      BCAP_HRESULT hr = bCapSlvChangeMode(0);
       return CAST_STATUS(hr);
     }
 
@@ -852,6 +1151,11 @@ public:
   BCAP_HRESULT bCapServerStart()
   {
     BCAP_HRESULT hr = bCap_ServiceStart(iSockFD_); /* Start b-CAP service */
+    return hr;
+  }
+  BCAP_HRESULT bCapServerStop()
+  {
+    BCAP_HRESULT hr = bCap_ServiceStop(iSockFD_); /* Start b-CAP service */
     return hr;
   }
 
@@ -902,7 +1206,7 @@ public:
       hr = bCapTakearm();
       if(FAILED(hr)) exit(1);
       ROS_INFO("bCapSetExternalSpeed");
-      hr = bCapSetExternalSpeed((char*)"100.0");
+      hr = bCapSetExternalSpeed(100.0);
       if(FAILED(hr)) exit(1);
 
       bCapInitializeVariableHandlers();
@@ -925,13 +1229,11 @@ public:
       }
 
       // enable logging
+      hr = bCapRobotExecute("clearLog", "");
+      if (FAILED(hr))
       {
-        BCAP_HRESULT hr = bCapRobotExecute("clearLog", "");
-        if (FAILED(hr))
-        {
-          ROS_FATAL("failed to enable logging mode");
-          SAFE_EXIT(1);
-        }
+        ROS_FATAL("failed to enable logging mode");
+        SAFE_EXIT(1);
       }
 
       // enable logging
@@ -943,45 +1245,28 @@ public:
       //   }
       // }
 
+      hr = bCapSlvChangeMode(0x202);
+      //BCAP_HRESULT hr = bCapSlvChangeMode((char*)"258"); // 0x102
+      if (FAILED(hr))
       {
-        BCAP_HRESULT hr = bCapSlvChangeMode((char*)"514"); // 0x202
-        //BCAP_HRESULT hr = bCapSlvChangeMode((char*)"258"); // 0x102
-        if (FAILED(hr))
-        {
-          ROS_FATAL("failed to change slave mode");
-          SAFE_EXIT(1);
-        }
+        ROS_FATAL("failed to change slave mode");
+        SAFE_EXIT(1);
       }
 
       ROS_INFO("initialize bCap slave connection");
-      std::vector<double> cur_jnt;
-      hr = bCapCurJnt(cur_jnt);
-      BCAP_VARIANT vntPose, vntResult;
-      vntPose.Type = VT_R8 | VT_ARRAY;
-      vntPose.Arrays = 8;
-      for (int i = 0; i < 8; i++)
+      hr = bCapFillBuffer();
+      if (FAILED(hr))
       {
-        vntPose.Value.DoubleArray[i] = cur_jnt[i];
-      }
-      // Fill the buffer for later use, 
-      // unless fill the buffer, bCap slave will fall down 
-      for (int i = 0; i < 4; i++) {
-          hr = bCapRobotSlvMove(&vntPose, &vntResult);
-          if (FAILED(hr)) {
-            ROS_WARN("result is %02x, failed", hr);
-            SAFE_EXIT(1);
-          }
+        ROS_FATAL("failed to fill bcap buffer");
+        SAFE_EXIT(1);
       }
       ROS_INFO("bCap slave initialization done");
 
-      // fill ac
-      int i = 0;
-      for (OpenControllersInterface::TransmissionIterator it = cm_->model_.transmissions_.begin();
-          it != cm_->model_.transmissions_.end(); ++it)
-      { // *** js and ac must be consistent
-        pr2_hardware_interface::Actuator *ac = hw_->getActuator((*it)->actuator_names_[0]);
-        ac->state_.position_ = DEG2RAD(cur_jnt[i]); // degree -> radian
-        i++;
+      hr = bCapReflectRealState();
+      if (FAILED(hr))
+      {
+        ROS_FATAL("failed to reflect real robot state into controller manager");
+        SAFE_EXIT(1);
       }
       setUDPTimeout((udp_timeout_ / 1000), (udp_timeout_ % 1000) * 1000);
     }
@@ -1004,19 +1289,19 @@ public:
       server_port_number_ = DEFAULT_SERVER_PORT_NUM;
     }
 
-    ROS_WARN("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
+    ROS_INFO("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
 
     // Determine the pre-set UDP timeout length.
     if (!node.getParam("udp_timeout", udp_timeout_))
     {
       udp_timeout_ = DEFAULT_UDP_TIMEOUT;
     }
-    ROS_WARN("udp_timeout: %d micro sec", udp_timeout_);
+    ROS_INFO("udp_timeout: %d micro sec", udp_timeout_);
   }
 
   void quitRequest()
   {
-    ROS_INFO("request quit to denso controller");
+    ROS_INFO("denso_controller received a quit request");
     OpenController::quitRequest(); // call super class
     ros::shutdown();
   }
