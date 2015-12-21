@@ -2,8 +2,8 @@
 Changelog for package vs060_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.2 (2015-12-21)
+------------------
 * Add vs060_gazebo pkg
 * Contributors: MahsaP
 

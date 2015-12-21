@@ -2,8 +2,8 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.2 (2015-12-21)
+------------------
 * use newer api function
 * set velocity correctly
 * add functions for finalizing things, update recovery procedures

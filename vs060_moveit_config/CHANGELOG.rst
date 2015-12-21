@@ -2,8 +2,8 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.2 (2015-12-21)
+------------------
 * [moveit config] Remove redundant portion in a launch
 * Contributors: Isaac I.Y. Saito
 
