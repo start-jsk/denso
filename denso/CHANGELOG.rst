@@ -2,6 +2,11 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add gazebo pkg to the metapkg suite
+* Contributors: Isaac I.Y. Saito
+
 1.1.1 (2015-11-03)
 ------------------
 * [fix] Always run in a dryrun mode (fix `#62 <https://github.com/start-jsk/denso/issues/62>`_)

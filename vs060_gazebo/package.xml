@@ -1,6 +1,6 @@
 <package>
   <name>vs060_gazebo</name>
-  <version>0.0.1</version>
+  <version>1.1.1</version>
   <description>The vs060_gazebo package</description>
   
   <author>Mahsa Parsapour</author>

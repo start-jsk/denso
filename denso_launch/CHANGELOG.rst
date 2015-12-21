@@ -2,6 +2,13 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* denso_launch/test/vs060.test: move denso_vs060_moveit_demo_test.py to vs060.test
+* denso_launch/test/vs060.test: do not have to check over 30sec,we need to wait to starting moveit, and test just for a second
+* [vs060] Add simple unit test cases for moveit
+* Contributors: Isaac I.Y. Saito, Kei Okada
+
 1.1.1 (2015-11-03)
 ------------------
 

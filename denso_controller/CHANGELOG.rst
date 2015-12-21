@@ -2,6 +2,17 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use newer api function
+* set velocity correctly
+* add functions for finalizing things, update recovery procedures
+* replace sleep with boost::this_thread::sleep
+* add function to reflect real robot state into controller manager
+* add emergency_stop variable
+* separate a procedure to fill buffer and re-use it
+* Contributors: Shohei Fujii
+
 1.1.1 (2015-11-03)
 ------------------
 * [fix] Always run in a dryrun mode (fix `#62 <https://github.com/start-jsk/denso/issues/62>`_)
