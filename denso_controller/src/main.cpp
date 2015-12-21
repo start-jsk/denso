@@ -194,7 +194,15 @@ public:
 
   BCAP_HRESULT bCapTakearm()
   {
-    BCAP_HRESULT hr = bCapRobotExecute("Takearm", "");
+    BCAP_VARIANT takearmparam, takearmresult;
+    takearmparam.Type = VT_I4 | VT_ARRAY;
+    takearmparam.Arrays = 2;
+    ((u_int*)(&takearmparam.Value.LongValue))[0] = 0;
+    ((u_int*)(&takearmparam.Value.LongValue))[1] = 1;
+    BCAP_HRESULT hr;
+    //hr = bCap_RobotExecute(iSockFD_, lhRobot_, "Takearm", takearmparam, &takearmresult);
+    hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "Takearm", &takearmparam, &takearmresult);
+    //BCAP_HRESULT hr = bCapRobotExecute("Takearm", "");
     return hr;
   }
 
@@ -206,9 +214,19 @@ public:
     return hr;
   }
 
-  BCAP_HRESULT bCapSetExternalSpeed(char* arg)
+  BCAP_HRESULT bCapSetExternalSpeed(float arg)
   {
-    BCAP_HRESULT hr = bCapRobotExecute("ExtSpeed", arg);
+    BCAP_HRESULT hr;
+    BCAP_VARIANT extspeedparam, extspeedresult;
+    extspeedparam.Type = VT_R4 | VT_ARRAY;
+    extspeedparam.Arrays = 1;
+    extspeedparam.Value.FloatValue = arg;
+    //((u_int*)(&extspeedparam.Value.LongValue))[1] = 0;
+    //((u_int*)(&extspeedparam.Value.LongValue))[2] = 0;
+    //hr = bCap_RobotExecute(iSockFD_, lhRobot_, "ExtSpeed", (char*)"80.0", &lResult);
+    hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "ExtSpeed", &extspeedparam, &extspeedresult);
+
+    //BCAP_HRESULT hr = bCapRobotExecute("ExtSpeed", arg);
     return hr;
   }
 
@@ -363,13 +381,24 @@ public:
   BCAP_HRESULT bCapMotor(bool command)
   {
     BCAP_HRESULT hr = BCAP_S_OK;
+    BCAP_VARIANT motorarmparam, motorarmresult;
+    motorarmparam.Type = VT_I4 | VT_ARRAY;
+    motorarmparam.Arrays = 2;
     if (command)
     {
-      hr = bCapRobotExecute("Motor", "1");
+      //hr = bCapRobotExecute("Motor", "1");
+      ((u_int*)(&motorarmparam.Value.LongValue))[0] = 1;
+      ((u_int*)(&motorarmparam.Value.LongValue))[1] = 0;
+
+      hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "Motor", &motorarmparam, &motorarmresult);
     }
     else
     {
-      hr = bCapRobotExecute("Motor", "0");
+      //hr = bCapRobotExecute("Motor", "0");
+      ((u_int*)(&motorarmparam.Value.LongValue))[0] = 0;
+      ((u_int*)(&motorarmparam.Value.LongValue))[1] = 1;
+
+      hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "Motor", &motorarmparam, &motorarmresult);
     }
     return hr;
   }
@@ -382,11 +411,17 @@ public:
     return hr;
   }
 
-  BCAP_HRESULT bCapSlvChangeMode(char* arg)
+  BCAP_HRESULT bCapSlvChangeMode(u_int arg)
   {
-    long lResult;
-    BCAP_HRESULT hr = bCap_RobotExecute(iSockFD_, lhRobot_, "slvChangeMode", arg, &lResult);
-    ROS_INFO("change slave mode: hr: %02x, result: %02x", hr, lResult);
+    //long lResult;
+    //BCAP_HRESULT hr = bCap_RobotExecute(iSockFD_, lhRobot_, "slvChangeMode", arg, &lResult);
+    BCAP_HRESULT hr;
+    BCAP_VARIANT slvchangeparam, slvchangeresult;
+    slvchangeparam.Type = VT_I4;
+    slvchangeparam.Arrays = 1;
+    slvchangeparam.Value.LongValue = arg;
+    hr = bCap_RobotExecute2(iSockFD_, lhRobot_, "slvChangeMode", &slvchangeparam, &slvchangeresult);
+    //ROS_INFO("change slave mode: hr: %02x, result: %02x", hr, slvchangeresult);
     return hr;
   }
 
@@ -564,7 +599,7 @@ public:
       BCAP_HRESULT hr = BCAP_S_OK;
       //bCapClearError();
 
-      hr = bCapSlvChangeMode((char*)"0");
+      hr = bCapSlvChangeMode(0);
       if (FAILED(hr))
       {
         ROS_WARN("failed to change slave mode");
@@ -839,7 +874,7 @@ public:
           ROS_WARN("failed to turn on motor %02x", hr);
           return CAST_STATUS(hr);
       }
-      hr = bCapSlvChangeMode((char*)"514");
+      hr = bCapSlvChangeMode(0x202);
       if (FAILED(hr)) {
           ROS_WARN("failed to change to slvmode %02x", hr);
           return CAST_STATUS(hr);
@@ -949,7 +984,7 @@ public:
         ROS_FATAL("failed to clear logging");
         return CAST_STATUS(hr);
       }
-      hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      hr = bCapSlvChangeMode(0x202);
       if (FAILED(hr))
       {
         ROS_FATAL("failed to change slave mode");
@@ -1027,7 +1062,7 @@ public:
           ROS_WARN("failed to turn on motor %02x", hr);
           return CAST_STATUS(hr);
         }
-        hr = bCapSlvChangeMode((char*)"514");
+        hr = bCapSlvChangeMode(0x202);
         if (FAILED(hr)) {
           ROS_WARN("failed to change to slvmode %02x", hr);
           return CAST_STATUS(hr);
@@ -1060,7 +1095,7 @@ public:
         ROS_WARN("failed to clear log");
         return CAST_STATUS(hr);
       }
-      hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      hr = bCapSlvChangeMode(0x202);
       if (FAILED(hr)) {
         ROS_WARN("failed to change slvmode, cannot recover");
         return CAST_STATUS(hr);
@@ -1081,7 +1116,7 @@ public:
     {
       //TODO rethink the way to recover
       ROS_INFO("invalid command when the robot is in slave mode, disable slave mode");
-      BCAP_HRESULT hr = bCapSlvChangeMode((char*)"0"); // 0x202
+      BCAP_HRESULT hr = bCapSlvChangeMode(0);
       return CAST_STATUS(hr);
     }
 
@@ -1171,7 +1206,7 @@ public:
       hr = bCapTakearm();
       if(FAILED(hr)) exit(1);
       ROS_INFO("bCapSetExternalSpeed");
-      hr = bCapSetExternalSpeed((char*)"100.0");
+      hr = bCapSetExternalSpeed(100.0);
       if(FAILED(hr)) exit(1);
 
       bCapInitializeVariableHandlers();
@@ -1210,7 +1245,7 @@ public:
       //   }
       // }
 
-      hr = bCapSlvChangeMode((char*)"514"); // 0x202
+      hr = bCapSlvChangeMode(0x202);
       //BCAP_HRESULT hr = bCapSlvChangeMode((char*)"258"); // 0x102
       if (FAILED(hr))
       {
