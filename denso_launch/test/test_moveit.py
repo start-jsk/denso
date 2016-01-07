@@ -72,7 +72,7 @@ class TestMoveit(unittest.TestCase):
         pose_target.orientation.z = -0.20
         pose_target.orientation.w = 0.98
         pose_target.position.x = 0.18
-        pose_target.position.y = -0.00
+        pose_target.position.y = 0.18
         pose_target.position.z = 0.94
         return pose_target
 
