@@ -1188,26 +1188,55 @@ public:
       BCAP_HRESULT hr;
       ROS_INFO("bCapOpen");
       hr = bCapOpen();
-      if(FAILED(hr)) exit(1);
+      if(FAILED(hr))
+      {
+        ROS_FATAL("failed to open bCap socket. Exitting...");
+        ROS_FATAL("make sure that your robot is connected to %s:%d", server_ip_address_.c_str(), server_port_number_);
+        exit(1);
+      }
       setUDPTimeout(2, 0); // 2000msec
       ROS_INFO("bCapServerStart");
       hr = bCapServerStart();
-      if(FAILED(hr)) exit(1);
+      if(FAILED(hr))
+      {
+        ROS_FATAL("failed to start bCap server. Exitting...");
+        exit(1);
+      }
       ROS_INFO("bCapControllerConnect");
       hr = bCapControllerConnect();
-      if(FAILED(hr)) exit(1);
+      if(FAILED(hr))
+      {
+        ROS_FATAL("failed to connect bCap controller. Exitting...");
+        exit(1);
+      }
       ROS_INFO("bCapClearError");
       hr = bCapClearError();
-      if(FAILED(hr)) exit(1);
+      if(FAILED(hr))
+      {
+        ROS_FATAL("failed to clear bCap error. Exitting...");
+        exit(1);
+      }
       ROS_INFO("bCapGetRobot");
       hr = bCapGetRobot();
-      if(FAILED(hr)) exit(1);
+      if(FAILED(hr))
+      {
+        ROS_FATAL("failed to get bCap robot. Exitting...");
+        exit(1);
+      }
       ROS_INFO("bCapTakearm");
       hr = bCapTakearm();
-      if(FAILED(hr)) exit(1);
+      if(FAILED(hr))
+      {
+        ROS_FATAL("failed to take bCap arm. Exitting...");
+        exit(1);
+      }
       ROS_INFO("bCapSetExternalSpeed");
       hr = bCapSetExternalSpeed(100.0);
-      if(FAILED(hr)) exit(1);
+      if(FAILED(hr))
+      {
+        ROS_FATAL("failed to set external speed. Exitting...");
+        exit(1);
+      }
 
       bCapInitializeVariableHandlers();
 
