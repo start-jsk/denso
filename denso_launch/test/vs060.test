@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find vs060_moveit_config)/launch/demo_simulation_noenvironment.launch">
+  <include file="$(find denso_launch)/launch/denso_vs060_moveit_demo_simulation.launch">
      <arg name="use_rviz" value="false" />  <!-- RViz/GUI is not needed for the tests -->
   </include>
   
