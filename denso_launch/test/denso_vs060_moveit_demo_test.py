@@ -14,7 +14,7 @@ class TestDensoMoveit(unittest.TestCase):
         self.arm = MoveGroupCommander("manipulator")
 
     def test_moveit(self):
-        p = [ 0.35, -0.35, 0.4]
+        p = [ 0.1, -0.35, 0.4]
         pose = PoseStamped(header = rospy.Header(stamp = rospy.Time.now(), frame_id = '/BASE'),
                            pose = Pose(position = Point(*p),
                                        orientation = Quaternion(*quaternion_from_euler(1.57, 0, 1.57, 'sxyz'))))
