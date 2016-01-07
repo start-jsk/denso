@@ -1289,14 +1289,20 @@ public:
       server_port_number_ = DEFAULT_SERVER_PORT_NUM;
     }
 
-    ROS_INFO("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
+    if (!dryrunp_)
+    {
+      ROS_INFO("server: %s:%d", server_ip_address_.c_str(), server_port_number_);
+    }
 
     // Determine the pre-set UDP timeout length.
     if (!node.getParam("udp_timeout", udp_timeout_))
     {
       udp_timeout_ = DEFAULT_UDP_TIMEOUT;
     }
-    ROS_INFO("udp_timeout: %d micro sec", udp_timeout_);
+    if (!dryrunp_)
+    {
+      ROS_INFO("udp_timeout: %d micro sec", udp_timeout_);
+    }
   }
 
   void quitRequest()
