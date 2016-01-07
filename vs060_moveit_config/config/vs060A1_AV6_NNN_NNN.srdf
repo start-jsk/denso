@@ -17,9 +17,6 @@
         <joint name="j5" />
         <joint name="flange" />
     </group>
-    <group name="manipulator_flange">
-        <joint name="flange" />
-    </group>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="BASE" link2="J1" reason="Adjacent" />
     <disable_collisions link1="BASE" link2="J2" reason="Never" />
