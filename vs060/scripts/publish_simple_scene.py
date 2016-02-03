@@ -12,6 +12,8 @@ import moveit_commander
 rospy.init_node("publish_simple_scene")
 
 # init moveit_commander
+ac = actionlib.SimpleActionClient('move_group', MoveGroupAction)
+ac.wait_for_server()
 moveit_commander.MoveGroupCommander('manipulator')
 scene_interface = moveit_commander.PlanningSceneInterface()
 # get_planning_scene
