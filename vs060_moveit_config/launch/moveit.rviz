@@ -43,13 +43,25 @@ Visualization Manager:
       Value: true
     - Class: moveit_rviz_plugin/MotionPlanning
       Enabled: true
+      Move Group Namespace: ""
       MoveIt_Goal_Tolerance: 0
+      MoveIt_Planning_Attempts: 10
       MoveIt_Planning_Time: 5
       MoveIt_Use_Constraint_Aware_IK: true
       MoveIt_Warehouse_Host: 127.0.0.1
       MoveIt_Warehouse_Port: 33829
+      MoveIt_Workspace:
+        Center:
+          X: 0
+          Y: 0
+          Z: 0
+        Size:
+          X: 2
+          Y: 2
+          Z: 2
       Name: MotionPlanning
       Planned Path:
+        Interrupt Display: false
         Links:
           All Links Enabled: true
           BASE:
@@ -91,12 +103,12 @@ Visualization Manager:
             Show Trail: false
             Value: true
           Link Tree Style: Links in Alphabetic Order
-        Loop Animation: false
+        Loop Animation: true
         Robot Alpha: 0.4
         Show Robot Collision: false
         Show Robot Visual: true
         Show Trail: false
-        State Display Time: 0.01s
+        State Display Time: 0.05s
         Trajectory Topic: /move_group/display_planned_path
       Planning Metrics:
         Payload: 1
@@ -174,14 +186,14 @@ Visualization Manager:
         Show Robot Visual: true
       Value: true
     - Class: rviz/Camera
-      Enabled: true
+      Enabled: false
       Image Rendering: background and overlay
       Image Topic: /camera/rgb/image_rect
       Name: Camera
       Overlay Alpha: 0.5
       Queue Size: 2
       Transport Hint: raw
-      Value: true
+      Value: false
       Visibility:
         Axes: true
         Grid: true
@@ -211,7 +223,7 @@ Visualization Manager:
       Radius: 0.03
       Reference Frame: <Fixed Frame>
       Value: true
-    - Alpha: 1
+    - Alpha: 0.8
       Class: rviz/RobotModel
       Collision Enabled: false
       Enabled: true
