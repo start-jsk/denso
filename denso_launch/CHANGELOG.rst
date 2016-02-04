@@ -2,6 +2,15 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* param name have cheanged single -> maxboard
+* fix xtion settings for hydro+
+* denso_launch: mv catkin.cmake -> CMakeList.txt
+* add publish_simple_scene.py and fix test code
+* remove demo_simulation_noenvironment: default launch is denso_vs060_moveit_demo_simulation.launch for dryrun, (i think...)
+* Contributors: Kei Okada
+
 1.1.2 (2015-12-21)
 ------------------
 * denso_launch/test/vs060.test: move denso_vs060_moveit_demo_test.py to vs060.test

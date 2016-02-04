@@ -2,6 +2,11 @@
 Changelog for package vs060_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [vs060_gazebo] package.xml improvement (correction, description, sort in alphabetical order)
+* Contributors: Isaac I.Y. Saito
+
 1.1.2 (2015-12-21)
 ------------------
 * Add vs060_gazebo pkg

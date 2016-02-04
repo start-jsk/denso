@@ -2,6 +2,13 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* wait for move_group
+* add publish_simple_scene.py and fix test code
+* add dummy root link, since we had "The root link BASE has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF." warning
+* Contributors: Kei Okada
+
 1.1.2 (2015-12-21)
 ------------------
 * vs060_world.launch is no longer requred

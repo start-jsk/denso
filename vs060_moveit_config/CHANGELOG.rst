@@ -2,6 +2,16 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add move_group/MoveGroupGetPlanningSceneService @ move_group.launch
+* remove demo_simulation_noenvironment: default launch is denso_vs060_moveit_demo_simulation.launch for dryrun, (i think...)
+* update rviz view (add loop, alpha for robot model)
+* use RRT Connect as default planner
+* update planner configs
+* fix for "Group 'manipulator_flange' is not a chain" error message
+* Contributors: Kei Okada
+
 1.1.2 (2015-12-21)
 ------------------
 * [moveit config] Remove redundant portion in a launch
