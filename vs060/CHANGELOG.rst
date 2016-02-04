@@ -2,8 +2,8 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.3 (2016-02-04)
+------------------
 * wait for move_group
 * add publish_simple_scene.py and fix test code
 * add dummy root link, since we had "The root link BASE has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF." warning

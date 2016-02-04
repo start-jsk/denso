@@ -2,8 +2,8 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.3 (2016-02-04)
+------------------
 * add move_group/MoveGroupGetPlanningSceneService @ move_group.launch
 * remove demo_simulation_noenvironment: default launch is denso_vs060_moveit_demo_simulation.launch for dryrun, (i think...)
 * update rviz view (add loop, alpha for robot model)

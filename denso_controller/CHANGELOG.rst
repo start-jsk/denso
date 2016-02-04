@@ -2,8 +2,8 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.3 (2016-02-04)
+------------------
 * call ROS_FATAL before exitting
 * do not print server:,,, udp_timeout:... for dryrun mode
 * Contributors: Kei Okada

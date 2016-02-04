@@ -2,8 +2,8 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.3 (2016-02-04)
+------------------
 * param name have cheanged single -> maxboard
 * fix xtion settings for hydro+
 * denso_launch: mv catkin.cmake -> CMakeList.txt
