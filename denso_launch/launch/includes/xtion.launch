@@ -3,7 +3,7 @@
   <include file="$(find openni_launch)/launch/openni.launch" />
   <!-- checkerboard -->
   <group ns="/camera/rgb/" >
-    <param name="single" value="1" />
+    <param name="maxboard" type="int" value="1"/>
     <param name="display" value="1" />
     <param name="rect0_size_x" value="0.030" />
     <param name="rect0_size_y" value="0.030" />
