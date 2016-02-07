@@ -38,9 +38,11 @@
 
 import unittest
 
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, PoseStamped, Point, Quaternion
+from tf.transformations import quaternion_from_euler
 from moveit_commander import MoveGroupCommander, MoveItCommanderException, RobotCommander
-from moveit_msgs.msg import RobotTrajectory
+from moveit_msgs.msg import RobotTrajectory, PlanningScene, PlanningSceneComponents
+from moveit_msgs.srv import GetPlanningScene
 import rospy
 
 
@@ -50,6 +52,7 @@ class TestMoveit(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
+        rospy.init_node('test_moveit_vs060')
         self.robot = RobotCommander()
         self._mvgroup = MoveGroupCommander(self._MOVEGROUP_MAIN)
         # Temporary workaround of planner's issue similar to https://github.com/tork-a/rtmros_nextage/issues/170
@@ -114,6 +117,34 @@ class TestMoveit(unittest.TestCase):
         # TODO Better way to check the plan is valid.
         # The following checks if plan execution was successful or not.
         self.assertTrue(self._mvgroup.go())
+
+    def test_set_pose_target(self):
+        '''
+        Check for simple planning, originally testd in moved from denso_vs060_moveit_demo_test.py
+        '''
+        self._plan()
+        p = [ 0.1, -0.35, 0.4]
+        pose = PoseStamped(header = rospy.Header(stamp = rospy.Time.now(), frame_id = '/BASE'),
+                           pose = Pose(position = Point(*p),
+                                       orientation = Quaternion(*quaternion_from_euler(1.57, 0, 1.57, 'sxyz'))))
+        self._mvgroup.set_pose_target(pose)
+        self.assertTrue(self._mvgroup.go() or self._mvgroup.go())
+
+    def test_planning_scene(self):
+        '''
+        Check if publish_simple_scene.py is working
+        '''
+        rospy.wait_for_service('/get_planning_scene', timeout=20);
+        get_planning_scene = rospy.ServiceProxy("/get_planning_scene", GetPlanningScene)
+        collision_objects = []
+        # wait for 10 sec
+        time_start = rospy.Time.now()
+        while not collision_objects and (rospy.Time.now() - time_start).to_sec() < 10.0:
+            world = get_planning_scene(PlanningSceneComponents(components=PlanningSceneComponents.WORLD_OBJECT_NAMES)).scene.world
+            collision_objects = world.collision_objects
+            rospy.loginfo("collision_objects = " + str(world.collision_objects))
+            rospy.sleep(1)
+        self.assertTrue(world.collision_objects != [], world)
 
 if __name__ == '__main__':
     import rostest

@@ -12,6 +12,4 @@
   <test pkg="rostest" type="hztest" test-name="test_move_group" name="test_move_group" time-limit="60"/>
   
   <test pkg="denso_launch" type="test_moveit.py" test-name="test_moveit_py" time-limit="60" retry="1" args="" />
-
-  <test test-name="denso_vs060_moveit_demo_test" pkg="denso_launch" type="denso_vs060_moveit_demo_test.py" />
 </launch>

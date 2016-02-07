@@ -2,11 +2,12 @@
 
 
 from geometry_msgs.msg import PoseStamped
-from moveit_msgs.msg import PlanningScene, PlanningSceneComponents
+from moveit_msgs.msg import PlanningScene, PlanningSceneComponents, MoveGroupAction
 from moveit_msgs.srv import GetPlanningScene
 
 import rospy
 import moveit_commander
+import actionlib
 
 # init rospy
 rospy.init_node("publish_simple_scene")
