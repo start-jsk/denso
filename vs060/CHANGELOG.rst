@@ -2,6 +2,11 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* publish_simple_scene: add missing imports
+* Contributors: Kei Okada
+
 1.1.3 (2016-02-04)
 ------------------
 * wait for move_group

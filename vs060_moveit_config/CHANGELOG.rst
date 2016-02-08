@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix xtion settings for real robots
+* Contributors: Kei Okada
+
 1.1.3 (2016-02-04)
 ------------------
 * add move_group/MoveGroupGetPlanningSceneService @ move_group.launch
