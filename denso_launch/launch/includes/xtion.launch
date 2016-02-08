@@ -21,5 +21,5 @@
       <param name="use_simple_tf" value="true" />
     </node>
   </group>
-  <node pkg="tf" type="static_transform_publisher" name="base_to_checkerboard" args="0.1 -0.1 -0.075 1 0 0 0 /object /BASE 10" />
+  <node pkg="tf" type="static_transform_publisher" name="base_to_checkerboard" args="0.0 -0.1 -0.075 1 0 0 0 /object /BASE 10" />
 </launch>

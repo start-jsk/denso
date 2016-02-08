@@ -1,6 +1,0 @@
-sensors: 
- - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
-   point_cloud_topic: /camera/depth_registered/points_filtered
-   max_range: 5.0
-   frame_subsample: 1
-   point_subsample: 1
