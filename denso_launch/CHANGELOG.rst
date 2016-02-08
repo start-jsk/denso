@@ -2,8 +2,8 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.4 (2016-02-08)
+------------------
 * fix xtion setings for real robots
 * denso_launch/test, move denso_vs060_moveit_demo_test.py and add test for publish_simple_scene.py
 * Contributors: Kei Okada

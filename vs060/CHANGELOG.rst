@@ -2,8 +2,8 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.4 (2016-02-08)
+------------------
 * publish_simple_scene: add missing imports
 * Contributors: Kei Okada
 
