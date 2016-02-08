@@ -4,3 +4,6 @@ sensors:
    max_range: 5.0
    frame_subsample: 1
    point_subsample: 1
+   shape_offset: 0
+   shape_scale: 1.0
+   shape_padding: 0.05
