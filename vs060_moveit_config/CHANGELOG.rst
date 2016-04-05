@@ -2,6 +2,9 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.1.4 (2016-02-08)
 ------------------
 * fix xtion settings for real robots
