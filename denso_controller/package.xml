@@ -1,6 +1,6 @@
 <package>
   <name>denso_controller</name>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
   <description>
    <p>This packages a common controller functionality for Denso's industrial manipulators based on <a href = "http://goo.gl/kL0vnf">ORiN</a> (Open Robot interface for the Network), a unified network interface for industrial robot applications.</p>
   </description>

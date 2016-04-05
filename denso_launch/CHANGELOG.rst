@@ -2,8 +2,8 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.5 (2016-04-05)
+------------------
 * install test directories
 * Contributors: Kei Okada
 
