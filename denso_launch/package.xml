@@ -11,13 +11,12 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>control_msgs</build_depend>
-  <build_depend>denso_controller</build_depend>
-  <build_depend>vs060_moveit_config</build_depend>
-  <build_depend>rostest</build_depend>
+
   <run_depend>control_msgs</run_depend>
   <run_depend>checkerboard_detector</run_depend>
   <run_depend>denso_controller</run_depend>
   <run_depend>vs060_moveit_config</run_depend>
+
+  <test_depend>rostest</test_depend>
 
 </package>
