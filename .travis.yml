@@ -40,7 +40,7 @@ script:
   # check test (this only works on indigo)
   - catkin_test_results build
   ### INSTALL
-  - catkin clean -a
+  - catkin clean -y
   # Enable install space
   - catkin config --install
   # Build [and Install] packages
