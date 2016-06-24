@@ -2,6 +2,11 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove unnessesary depends
+* Contributors: Kei Okada
+
 1.1.5 (2016-04-05)
 ------------------
 * install test directories
