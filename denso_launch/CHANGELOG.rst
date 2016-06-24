@@ -2,8 +2,8 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.6 (2016-06-24)
+------------------
 * remove unnessesary depends
 * Contributors: Kei Okada
 
