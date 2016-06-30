@@ -66,7 +66,7 @@
 
 #include <realtime_tools/realtime_publisher.h>
 #include <std_msgs/Float64.h>
-#define BCAP_CONNECTION_UDP 1
+#define BCAP_CONNECTION_UDP
 #include "utf8.h"
 #include "b-Cap.h"
 
@@ -978,12 +978,12 @@ public:
         ROS_WARN("failed to turn on motor %02x", hr);
         return CAST_STATUS(hr);
       }
-      hr = bCapRobotExecute("clearLog", "");
-      if (FAILED(hr))
-      {
-        ROS_FATAL("failed to clear logging");
-        return CAST_STATUS(hr);
-      }
+      //hr = bCapRobotExecute("clearLog", "");
+      //if (FAILED(hr))
+      //{
+      //  ROS_FATAL("failed to clear logging");
+      //  return CAST_STATUS(hr);
+      //}
       hr = bCapSlvChangeMode(0x202);
       if (FAILED(hr))
       {
@@ -1007,7 +1007,7 @@ public:
       return CAST_STATUS(hr);
     }
 
-    if (errorcode == 0x84201486)
+    if (errorcode == 0x803022ef || errorcode == 0x84201486)
     {
         u_int mode;
         boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
@@ -1172,7 +1172,6 @@ public:
     hw_->addActuator(new pr2_hardware_interface::Actuator("j5_motor"));
     hw_->addActuator(new pr2_hardware_interface::Actuator("flange_motor"));
     // // Create controller manager
-    //pr2_controller_manager::ControllerManager cm_(ec.hw_);
     cm_ = boost::shared_ptr<pr2_controller_manager::ControllerManager>(
         new pr2_controller_manager::ControllerManager(hw_));
   }
@@ -1258,12 +1257,12 @@ public:
       }
 
       // enable logging
-      hr = bCapRobotExecute("clearLog", "");
-      if (FAILED(hr))
-      {
-        ROS_FATAL("failed to enable logging mode");
-        SAFE_EXIT(1);
-      }
+      //hr = bCapRobotExecute("clearLog", "");
+      //if (FAILED(hr))
+      //{
+      //  ROS_FATAL("failed to enable logging mode");
+      //  SAFE_EXIT(1);
+      //}
 
       // enable logging
       // {
