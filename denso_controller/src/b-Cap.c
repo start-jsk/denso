@@ -205,7 +205,7 @@ static void                             bFree(void *pPtr);
 /* module variables */
 static u_short                  m_iSerialNo = 1;                                                /* packet serial number: cyclic from 0x0001 to 0xFFFF */
 
-#if BCAP_CONNECTION_UDP
+#ifdef BCAP_CONNECTION_UDP
 static  struct sockaddr_in      m_sockServerAddr;                                               /* server's socket address */ 
 #endif
 
@@ -307,7 +307,7 @@ BCAP_HRESULT    bCap_Open(const char *pIPStr, int iPort, int *iSockFd) {
         inet_aton(pIPStr, &(serverAddr.sin_addr));*/
 #endif
 
-#if BCAP_CONNECTION_UDP
+#ifdef BCAP_CONNECTION_UDP
         memcpy( (char *)&m_sockServerAddr, (char *)&serverAddr, sockAddrSize);
         /* socket  */
         if( (*iSockFd = socket( AF_INET, SOCK_DGRAM, 0)) == -1) {
@@ -1900,7 +1900,7 @@ static u_char *receivePacket(int iSockFd, int* retryp){
         int lRecLen;
         u_int lHeaderLen;
         
-#if BCAP_CONNECTION_UDP
+#ifdef BCAP_CONNECTION_UDP
         socklen_t         fromlen;
         struct sockaddr_in      serverAddr;                     /* server's socket address */ 
 #endif
@@ -1920,7 +1920,7 @@ static u_char *receivePacket(int iSockFd, int* retryp){
                 lRecLen = read(iSockFd, (char *)&(pRcvBuffer[lRecvSize]), lHeaderLen - lRecvSize);
 #endif
 #else
-#if BCAP_CONNECTION_UDP
+#ifdef BCAP_CONNECTION_UDP
                 fromlen = sizeof(serverAddr);
                 memset( (char *)&serverAddr, 0, sizeof(struct sockaddr_in));
                 *retryp = 0;
@@ -1983,7 +1983,7 @@ static u_char *receivePacket(int iSockFd, int* retryp){
 #endif
 
 #else
-#if BCAP_CONNECTION_UDP
+#ifdef BCAP_CONNECTION_UDP
                         fromlen = sizeof(serverAddr);
                         lRecLen = recvfrom(iSockFd, (char *)&(pRemainData[lRecvSize]), lRemainSize -lRecvSize , 0, (struct sockaddr *)&serverAddr, &fromlen);
                         /* if the sock is not from the server, then ignore  */
@@ -2051,7 +2051,7 @@ ExitPoint:
 #endif
 
 #else
-#if BCAP_CONNECTION_UDP
+#ifdef BCAP_CONNECTION_UDP
                 iSent = sendto(iSockFd, (char *)pBuff, iLen, 0, (struct sockaddr *)&m_sockServerAddr, sizeof(m_sockServerAddr));
 #else /* TCP */
                 iSent = send(iSockFd, (char *)pBuff, iLen, 0);
