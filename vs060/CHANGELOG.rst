@@ -2,8 +2,8 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.7 (2016-08-23)
+------------------
 * publish_simple_scene.py : quit due to https://github.com/ros-planning/moveit_commander/pull/46/files and wait untel 3 collision object has been published
 * Contributors: Kei Okada
 
