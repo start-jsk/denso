@@ -9,6 +9,10 @@ import rospy
 import moveit_commander
 import actionlib
 
+# workaround for core dump whenever exiting Python MoveIt script (https://github.com/ros-planning/moveit_commander/issues/15#issuecomment-34441531)
+import atexit, os
+atexit.register(lambda : os._exit(0))
+
 # init rospy
 rospy.init_node("publish_simple_scene")
 
@@ -45,6 +49,7 @@ while not rospy.is_shutdown():
     
     rate.sleep()
 
-    if get_planning_scene and get_planning_scene(PlanningSceneComponents(components=PlanningSceneComponents.WORLD_OBJECT_NAMES)).scene.world.collision_objects != []:
+    print len(get_planning_scene(PlanningSceneComponents(components=PlanningSceneComponents.WORLD_OBJECT_NAMES)).scene.world.collision_objects)
+    if get_planning_scene and len(get_planning_scene(PlanningSceneComponents(components=PlanningSceneComponents.WORLD_OBJECT_NAMES)).scene.world.collision_objects) >= 3:
         break
 
