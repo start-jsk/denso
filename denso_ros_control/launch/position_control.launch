@@ -1,0 +1,18 @@
+<launch>
+  <rosparam file="$(find denso_ros_control)/config/denso_controllers.yaml" command="load"/>
+
+  <group ns="arm_controller">
+    <param name="robot_description" textfile="$(find vs060)/model/vs060A1_AV6_NNN_NNN.urdf" />
+    <param name="server_ip" value="10.3.147.61"/>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="30.0" />
+    </node>
+
+    <node name="denso_ros_control" pkg="denso_ros_control" type="denso_ros_control" output="screen">
+    </node>
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+          args="joint_state_controller j1_position_controller j2_position_controller j3_position_controller j4_position_controller j5_position_controller flange_position_controller "/>
+  </group>
+</launch>

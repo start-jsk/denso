@@ -1,0 +1,31 @@
+arm_controller:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 100  
+
+  # Position Controllers ---------------------------------------
+  j1_position_controller:
+    type: position_controllers/JointPositionController
+    joint: j1
+    #pid: {p: 1.0, i: 0.0, d: 0.0}
+  j2_position_controller:
+    type: position_controllers/JointPositionController
+    joint: j2
+    #pid: {p: 1.0, i: 0.0, d: 0.0}
+  j3_position_controller:
+    type: position_controllers/JointPositionController
+    joint: j3
+    #pid: {p: 1.0, i: 0.0, d: 0.0}
+  j4_position_controller:
+    type: position_controllers/JointPositionController
+    joint: j4
+    #pid: {p: 1.0, i: 0.0, d: 0.0}
+  j5_position_controller:
+    type: position_controllers/JointPositionController
+    joint: j5
+    #pid: {p: 1.0, i: 0.0, d: 0.0}
+  flange_position_controller:
+    type: position_controllers/JointPositionController
+    joint: flange
+    #pid: {p: 1.0, i: 0.0, d: 0.0}
