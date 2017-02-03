@@ -160,7 +160,11 @@
     <child  link="J1"/>
     <origin xyz="0 4.04121e-17 0.182" rpy="0 -0 0 "/>
     <axis   xyz="0 0 1"/>
-    <!-- <limit lower="-2.96706" upper="2.96706" effort="19.7336" velocity="0.5" /> -->
+    <limit lower="-2.96706" upper="2.96706" effort="19.7336" velocity="0.5" />
+    <safety_controller k_position="1"
+      k_velocity="1"
+      soft_lower_limit="-2.96"
+      soft_upper_limit="2.96" />
 <limit lower="-2.96706" upper="2.96706" effort="19.7336" velocity="0.5" />
   </joint>
   <transmission name="j2" type="pr2_mechanism_model/SimpleTransmission">
@@ -174,6 +178,10 @@
     <origin xyz="0 3.61933e-17 0.163" rpy="0 -0 0 "/>
     <axis   xyz="0 1 0"/>
     <limit lower="-2.0944" upper="2.0944" effort="16.8447" velocity="0.5" />
+    <safety_controller k_position="1"
+      k_velocity="1"
+      soft_lower_limit="-2.09"
+      soft_upper_limit="2.09" />
   </joint>
   <transmission name="j3" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="j3_motor"/>
@@ -186,6 +194,10 @@
     <origin xyz="0 6.77236e-17 0.305" rpy="0 -0 0 "/>
     <axis   xyz="0 1 0"/>
     <limit lower="-2.18166" upper="2.70526" effort="20.7089" velocity="0.5" />
+    <safety_controller k_position="1"
+      k_velocity="1"
+      soft_lower_limit="-2.15"
+      soft_upper_limit="2.7" />
   </joint>
   <transmission name="j4" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="j4_motor"/>
@@ -210,6 +222,10 @@
     <origin xyz="0 2.9976e-17 0.135" rpy="0 -0 0 "/>
     <axis   xyz="0 1 0"/>
     <limit lower="-2.0944" upper="2.0944" effort="23.7229" velocity="0.5" />
+    <safety_controller k_position="1"
+      k_velocity="1"
+      soft_lower_limit="-2.09"
+      soft_upper_limit="2.09" />
   </joint>
   <transmission name="flange" type="pr2_mechanism_model/SimpleTransmission">
     <actuator name="flange_motor"/>
@@ -222,5 +238,9 @@
     <origin xyz="0 1.55431e-17 0.07" rpy="0 -0 0 "/>
     <axis   xyz="0 0 1"/>
     <limit lower="-6.28319" upper="6.28319" effort="33.5103" velocity="0.5" />
+    <safety_controller k_position="1"
+      k_velocity="1"
+      soft_lower_limit="-6.28"
+      soft_upper_limit="6.28" />
   </joint>
 </robot>
