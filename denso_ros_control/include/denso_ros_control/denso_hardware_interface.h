@@ -117,11 +117,11 @@ public:
       SoftJointLimits soft_limits;
       const bool urdf_limits_ok = getJointLimits(model.getJoint(jointname), limits);
       if (!urdf_limits_ok) {
-        ROS_WARN("urdf limits int joint %s is not defined", jointname);
+        ROS_WARN("urdf limits int joint %s is not defined", jointname.c_str());
       }
       const bool urdf_soft_limits_ok = getSoftJointLimits(model.getJoint(jointname), soft_limits);
       if (!urdf_soft_limits_ok) {
-        ROS_WARN("urdf soft limits int joint %s is not defined", jointname);
+        ROS_WARN("urdf soft limits int joint %s is not defined", jointname.c_str());
       }
       // Register handle in joint limits interface
       PositionJointSoftLimitsHandle limits_handle(pos_handle, // We read the state and read/write the command
