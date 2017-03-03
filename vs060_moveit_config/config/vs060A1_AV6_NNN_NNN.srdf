@@ -20,6 +20,22 @@
     <group name="manipulator_flange">
         <link name="Flange" />
     </group>
+    <group_state name="initial_pose" group="manipulator">
+        <joint name="j1" value="0" />
+        <joint name="j2" value="0" />
+        <joint name="j3" value="0" />
+        <joint name="j4" value="0" />
+        <joint name="j5" value="0" />
+        <joint name="flange" value="0" />
+    </group_state>
+    <group_state name="neutral_pose" group="manipulator">
+        <joint name="j1" value="0" />
+        <joint name="j2" value="0.261799" />
+        <joint name="j3" value="0.785398" />
+        <joint name="j4" value="0" />
+        <joint name="j5" value="0.523599" />
+        <joint name="flange" value="0" />
+    </group_state>
     <end_effector name="manipulator_eef" parent_link="Flange"
                   group="manipulator_flange" parent_group="manipulator" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
