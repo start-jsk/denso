@@ -2,11 +2,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vs060)
 
-find_package(catkin REQUIRED COMPONENTS roslang roscpp open_controllers_interface moveit_commander moveit_ros_planning)
+find_package(catkin REQUIRED COMPONENTS roslang roscpp moveit_commander moveit_ros_planning)
 
 catkin_package(
   DEPENDS
-  CATKIN-DEPENDS roslang roscpp open_controllers_interface moveit_commander moveit_ros_planning
+  CATKIN-DEPENDS roslang roscpp moveit_commander moveit_ros_planning
   INCLUDE_DIRS
   LIBRARIES
 )
