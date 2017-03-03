@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add group state initial_pose / neutral_pose (`#84 <https://github.com/start-jsk/denso/pull/84>`_)
+* Contributors: Kei Okada
+
 1.1.7 (2016-08-23)
 ------------------
 

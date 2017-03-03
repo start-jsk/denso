@@ -2,6 +2,9 @@
 Changelog for package denso_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.1.7 (2016-08-23)
 ------------------
 
