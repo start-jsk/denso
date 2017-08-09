@@ -2,6 +2,11 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use moveit_simple_controller_manager
+* Contributors: Kei Okada
+
 1.1.8 (2017-03-03)
 ------------------
 * add group state initial_pose / neutral_pose (`#84 <https://github.com/start-jsk/denso/pull/84>`_)

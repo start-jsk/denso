@@ -2,6 +2,15 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* initial commit for supporting ros_control (`#82 <https://github.com/fkanehiro/hrpsys-base/issues/82>`)
+  * fix CATKIN-DEPENDS -> CATKIN_DEPENDS
+  * add cxx_range_for publish_scene_from_text
+  * drop drop dependency of vs060 to open_controllers_interface
+
+* Contributors: Shohei Fujii
+
 1.1.8 (2017-03-03)
 ------------------
 

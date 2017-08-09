@@ -2,6 +2,12 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix CATKIN-DEPENDS -> CATKIN_DEPENDS
+* denso_launch depends on denso_ros_control
+* Contributors: Kei Okada
+
 1.1.8 (2017-03-03)
 ------------------
 

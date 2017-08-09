@@ -1,9 +1,14 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package vs060_gazebo
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package denso_ros_control
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2017-08-09)
+------------------
+* initial commit for supporting ros_control (`#82 <https://github.com/fkanehiro/hrpsys-base/issues/82>`)
+  * fix compilation error
+  * initial commit for supporting ros_control
+
+* Contributors: Shohei Fujii
 
 1.1.8 (2017-03-03)
 ------------------
@@ -22,13 +27,9 @@ Forthcoming
 
 1.1.3 (2016-02-04)
 ------------------
-* [vs060_gazebo] package.xml improvement (correction, description, sort in alphabetical order)
-* Contributors: Isaac I.Y. Saito
 
 1.1.2 (2015-12-21)
 ------------------
-* Add vs060_gazebo pkg
-* Contributors: MahsaP
 
 1.1.1 (2015-11-03)
 ------------------
