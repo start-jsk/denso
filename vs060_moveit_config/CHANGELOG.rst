@@ -2,8 +2,8 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2017-08-09)
+------------------
 * use moveit_simple_controller_manager
 * Contributors: Kei Okada
 

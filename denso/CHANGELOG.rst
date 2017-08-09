@@ -2,8 +2,8 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2017-08-09)
+------------------
 * update denso meta package
 * Contributors: Kei Okada
 
