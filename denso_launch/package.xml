@@ -14,7 +14,7 @@
 
   <run_depend>control_msgs</run_depend>
   <run_depend>checkerboard_detector</run_depend>
-  <run_depend>denso_controller</run_depend>
+  <run_depend>denso_ros_control</run_depend>
   <run_depend>vs060_moveit_config</run_depend>
 
   <test_depend>rostest</test_depend>
