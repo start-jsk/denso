@@ -23,7 +23,6 @@
   <run_depend>vs060</run_depend>
   <run_depend>vs060_gazebo</run_depend>
   <run_depend>vs060_moveit_config</run_depend>
-  <run_depend>denso_pendant_publisher</run_depend>
 
   <export><metapackage/></export>
 </package>
