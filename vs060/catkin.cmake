@@ -15,6 +15,7 @@ include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 add_executable(publish_scene_from_text src/publish_scene_from_text.cpp)
 target_link_libraries(publish_scene_from_text ${catkin_LIBRARIES})
+target_compile_features(publish_scene_from_text PRIVATE cxx_range_for)
 
 install(TARGETS publish_scene_from_text
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
