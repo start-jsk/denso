@@ -2,6 +2,11 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove denso_pendant_publisher
+* Contributors: Kei Okada
+
 2.0.0 (2017-08-09)
 ------------------
 * update denso meta package
