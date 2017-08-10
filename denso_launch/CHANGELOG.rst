@@ -2,6 +2,9 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.1 (2017-08-09)
+------------------
+
 2.0.0 (2017-08-09)
 ------------------
 * fix CATKIN-DEPENDS -> CATKIN_DEPENDS

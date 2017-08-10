@@ -2,6 +2,9 @@
 Changelog for package denso_ros_control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.1 (2017-08-09)
+------------------
+
 2.0.0 (2017-08-09)
 ------------------
 * initial commit for supporting ros_control (`#82 <https://github.com/fkanehiro/hrpsys-base/issues/82>`)
