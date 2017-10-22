@@ -50,6 +50,8 @@ from moveit_msgs.msg import RobotTrajectory, PlanningScene, PlanningSceneCompone
 from moveit_msgs.srv import GetPlanningScene
 import rospy
 
+import actionlib
+from moveit_msgs.msg import MoveGroupAction
 
 class TestMoveit(unittest.TestCase):
     _MOVEGROUP_MAIN = 'manipulator'
@@ -58,6 +60,11 @@ class TestMoveit(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         rospy.init_node('test_moveit_vs060')
+        # wait for /move_group/goal
+        client = actionlib.SimpleActionClient('move_group', MoveGroupAction)
+        rospy.loginfo('wait for move_group')
+        client.wait_for_server();
+        rospy.loginfo('wait for move_group done')
         self.robot = RobotCommander()
         self._mvgroup = MoveGroupCommander(self._MOVEGROUP_MAIN)
         # Temporary workaround of planner's issue similar to https://github.com/tork-a/rtmros_nextage/issues/170
