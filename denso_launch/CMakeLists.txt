@@ -14,5 +14,5 @@ install(DIRECTORY launch test DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION} US
 
 if(CATKIN_ENABLE_TESTING)
   find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest(test/vs060.test)
+  #add_rostest(test/vs060.test)
 endif()
