@@ -34,6 +34,8 @@
 #
 # Author: Isaac Isao Saito
 
+## THIS IS A COPY FROM irex_demo.py, removing reading dead-man switch from pendant
+
 #%Tag(FULLTEXT)%
 
 ## workaround until https://github.com/ros-planning/moveit/pull/581 is released
@@ -58,9 +60,6 @@ from tf.transformations import quaternion_from_euler
 
 rospy.init_node("test_vs060_moveit")
 
-g_runnable = False
-g_prev_status = None
-
 arm = MoveGroupCommander("manipulator")
 running_pub = rospy.Publisher("/irex_demo_running", std_msgs.msg.Bool);
 #cancel_pub = rospy.Publisher("/arm_controller/follow_joint_trajectory/cancel", actionlib_msgs.msg.GoalID);
@@ -79,16 +78,13 @@ print 'LOAD_SCENE_PROG=', LOAD_SCENE_PROG
 
 def demo() :
     # load scene
-    global g_runnable
-    running_pub.publish(std_msgs.msg.Bool(g_runnable))
     check_call([LOAD_SCENE_PROG, SCENE_FILE])
     for p in [[ 0.35, -0.35, 0.4],
               [ 0.6,  0.0, 0.4],
               [ 0.35,  0.35, 0.4],
               [ 0.6,  0.0, 0.2],
               [ 0.4,  0.0, 0.8]]:
-        running_pub.publish(std_msgs.msg.Bool(g_runnable))
-        if g_runnable:
+        if True:
             print "set_pose_target(", p, ")"
             pose = PoseStamped(header = rospy.Header(stamp = rospy.Time.now(), frame_id = '/BASE'),
                                pose = Pose(position = Point(*p),
