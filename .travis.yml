@@ -54,4 +54,4 @@ script:
   # Run tests
   - catkin run_tests
   # check test (this only works on indigo)
-  - catkin_test_results build
+  - catkin_test_results build --verbose
