@@ -22,6 +22,8 @@
   </group>
 
   <group if="$(arg include_startup_launch)">
-  <include file="$(find denso_launch)/launch/denso_vs060_startup_$(arg mode).launch" />
+    <include file="$(find denso_ros_control)/launch/position_control.launch" >
+      <arg name="dryrun" value="true" />
+    </include>
   </group>
 </launch>
