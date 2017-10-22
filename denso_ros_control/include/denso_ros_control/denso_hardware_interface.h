@@ -60,6 +60,11 @@ public:
     KDL::SegmentMap::const_iterator root_segment = tree.getRootSegment();
     std::vector<const KDL::Joint*> joints;
     appendJoint(root_segment->second.children[0], joints);
+    // skip fixed joint https://stackoverflow.com/questions/4478636/stdremove-if-lambda-not-removing-anything-from-the-collection
+    auto new_end = std::remove_if(joints.begin(), joints.end(),
+                                  [](const KDL::Joint*& joint)->bool
+                                  { return joint->getType() == KDL::Joint::None; });
+    joints.erase(new_end, joints.end());
 
     int num_joints = joints.size();
     cmd_.resize(num_joints);
