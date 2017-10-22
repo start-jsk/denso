@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+## workaround until https://github.com/ros-planning/moveit/pull/581 is released
+import sys
+sys.modules["pyassimp"] = sys
+import pyassimp
 
 from geometry_msgs.msg import PoseStamped
 from moveit_msgs.msg import PlanningScene, PlanningSceneComponents, MoveGroupAction

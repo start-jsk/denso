@@ -36,6 +36,12 @@
 
 #%Tag(FULLTEXT)%
 
+## workaround until https://github.com/ros-planning/moveit/pull/581 is released
+import sys
+sys.modules["pyassimp"] = sys
+import pyassimp
+
+
 import os
 from subprocess import check_call
 
