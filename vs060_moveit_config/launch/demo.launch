@@ -1,7 +1,7 @@
 <launch>
   <arg name="use_kinect" default="false" />
   <arg name="use_rviz" default="true" />
-  <arg name="mode" default="real" />
+  <arg name="dryrun" default="true" />
   <arg name="include_startup_launch" default="true" />
   <include file="$(find vs060_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="true"/>
@@ -23,7 +23,7 @@
 
   <group if="$(arg include_startup_launch)">
     <include file="$(find denso_ros_control)/launch/position_control.launch" >
-      <arg name="dryrun" value="true" />
+      <arg name="dryrun" value="$(arg dryrun)" />
     </include>
   </group>
 </launch>
