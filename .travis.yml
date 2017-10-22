@@ -22,6 +22,10 @@ install:
   - sudo sh -c "echo \"deb ${REPOSITORY} `lsb_release -cs` main\" > /etc/apt/sources.list.d/ros-latest.list"
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
+  ### MongoDB hack
+  - sudo apt-get remove --purge -qq -y mongodb mongodb-10gen || echo "ok"
+  - sudo apt-get install -qq -y mongodb-clients mongodb-server -o Dpkg::Options::="--force-confdef" || echo "ok"
+  ###
   - sudo apt-get install -qq -y python-rosdep python-catkin-tools ros-${ROS_DISTRO}-catkin
   - sudo rosdep init
   - rosdep update
