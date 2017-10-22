@@ -25,6 +25,7 @@ extern "C"{
 /*#define	BCAP_CONNECTION_TCP		TCP/IP (DEFAULT if BCAP_CONNECTION_XXX is not defined.) */ 
 /*#define	BCAP_CONNECTION_UDP		UDP/IP */ 
 /*#define	BCAP_CONNECTION_COM		COM(Serial device) */ 
+#define BCAP_CONNECTION_UDP
 #if WIN32
 #define SERIAL_BAUDRATE		115200
 #else

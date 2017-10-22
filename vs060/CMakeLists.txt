@@ -1,43 +1,28 @@
-if(NOT USE_ROSBUILD)
-  include(catkin.cmake)
-  return()
+# http://ros.org/doc/groovy/api/catkin/html/user_guide/supposed.html
+cmake_minimum_required(VERSION 2.8.3)
+project(vs060)
+
+find_package(catkin REQUIRED COMPONENTS roslang roscpp moveit_commander moveit_ros_planning)
+
+catkin_package(
+  DEPENDS
+  CATKIN_DEPENDS roslang roscpp moveit_commander moveit_ros_planning
+  INCLUDE_DIRS
+  LIBRARIES
+)
+
+include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+
+add_executable(publish_scene_from_text src/publish_scene_from_text.cpp)
+target_link_libraries(publish_scene_from_text ${catkin_LIBRARIES})
+if ($ENV{ROS_DISTRO} STRGREATER "indigo")
+  target_compile_features(publish_scene_from_text PRIVATE cxx_range_for)
 endif()
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
-
-rosbuild_init()
-
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
-
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-# rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
-rosbuild_add_executable(publish_scene_from_text src/publish_scene_from_text.cpp)
-
-# set(SETUP_DIRECTORY $ENV{XDG_DESKTOP_DIR})
-# if ("${SETUP_DIRECTORY}" STREQUAL "")
-#   set(SETUP_DIRECTORY $ENV{HOME}/Desktop)
-# endif ("${SETUP_DIRECTORY}" STREQUAL "")
-# set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
-# configure_file(${PROJECT_SOURCE_DIR}/DensoPickUp.desktop.in ${SETUP_DIRECTORY}/DensoPickUp.desktop)
-# add_custom_target(desktop ALL DEPENDS ${PROJECT_SOURCE_DIR}/DensoPickUp.desktop.in)
+install(TARGETS publish_scene_from_text
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+install(DIRECTORY model DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY scripts DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION} USE_SOURCE_PERMISSIONS)
