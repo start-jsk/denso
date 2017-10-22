@@ -13,6 +13,6 @@
     </node>
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
-          args="joint_state_controller j1_position_controller j2_position_controller j3_position_controller j4_position_controller j5_position_controller flange_position_controller "/>
+          args="joint_state_controller position_trajectory_controller"/>
   </group>
 </launch>
