@@ -125,10 +125,15 @@ class TestMoveit(unittest.TestCase):
         Evaluate Plan and Execute works.
         Currently no value checking is done (, which is better to be implemented)
         '''
-        self._plan()
-        # TODO Better way to check the plan is valid.
-        # The following checks if plan execution was successful or not.
-        self.assertTrue(self._mvgroup.go() or self._mvgroup.go() )
+        for i in range(3):
+            self._plan()
+            # TODO Better way to check the plan is valid.
+            # The following checks if plan execution was successful or not.
+            ret = self._mvgroup.go()
+            if ret:
+                break
+            rospy.sleep(3)
+        self.assertTrue(ret)
 
     def test_set_pose_target(self):
         '''
@@ -139,8 +144,13 @@ class TestMoveit(unittest.TestCase):
         pose = PoseStamped(header = rospy.Header(stamp = rospy.Time.now(), frame_id = '/BASE'),
                            pose = Pose(position = Point(*p),
                                        orientation = Quaternion(*quaternion_from_euler(1.57, 0, 1.57, 'sxyz'))))
-        self._mvgroup.set_pose_target(pose)
-        self.assertTrue(self._mvgroup.go() or self._mvgroup.go())
+        for i in range(3):
+            self._mvgroup.set_pose_target(pose)
+            ret = self._mvgroup.go()
+            if ret:
+                break
+            rospy.sleep(3)
+        self.assertTrue(ret)
 
     def test_planning_scene(self):
         '''
