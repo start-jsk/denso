@@ -1,4 +1,5 @@
 <launch>
   <include file="$(find vs060_moveit_config)/launch/demo.launch">
+    <arg name="dryrun" value="false" />
   </include>
 </launch>

@@ -1,9 +1,18 @@
 <launch>
+  <arg name="robot_description" default="$(find vs060)/model/vs060A1_AV6_NNN_NNN.urdf" />
+  <arg name="server_ip" default="10.3.147.61" />
+  <arg name="udp_timeout" default="10000" />
+  <arg name="server_port" default="5007" />
+  <arg name="dryrun" default="false" />
+
   <rosparam file="$(find denso_ros_control)/config/denso_controllers.yaml" command="load"/>
 
   <group ns="arm_controller">
-    <param name="robot_description" textfile="$(find vs060)/model/vs060A1_AV6_NNN_NNN.urdf" />
-    <param name="server_ip" value="10.3.147.61"/>
+    <param name="robot_description" textfile="$(arg robot_description)" />
+    <param name="server_ip" value="$(arg server_ip)" />
+    <param name="udp_timeout" value="$(arg udp_timeout)" />
+    <param name="server_port" value="$(arg server_port)" />
+    <param name="dryrun" value="$(arg dryrun)" />
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
       <param name="publish_frequency" type="double" value="30.0" />
@@ -13,6 +22,6 @@
     </node>
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
-          args="joint_state_controller j1_position_controller j2_position_controller j3_position_controller j4_position_controller j5_position_controller flange_position_controller "/>
+          args="--shutdown-timeout 0.1 joint_state_controller position_trajectory_controller"/>
   </group>
 </launch>

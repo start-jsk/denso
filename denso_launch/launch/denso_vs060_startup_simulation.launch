@@ -1,5 +1,0 @@
-<launch>
-  <include file="$(find denso_launch)/launch/denso_vs060_startup_skelton.launch">
-    <arg name="controller_argument" value="-d" />
-  </include>
-</launch>

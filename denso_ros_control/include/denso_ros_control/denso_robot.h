@@ -503,6 +503,13 @@ public:
   }
 
   bool read(std::vector<double>& pos) {
+    if (dryrunp_)
+    {
+      for (int i = 0; i < num_joints_; i++) {
+        pos[i] = jntvalues_[i];
+      }
+      return true;
+    }
     // fill ac
     BCAP_HRESULT hr;
     hr = bCapCurJnt(pos);
@@ -513,6 +520,14 @@ public:
   }
   bool write(const std::vector<double>& cmd, std::vector<double>& pos)
   {
+    if (dryrunp_)
+    {
+      for (int i = 0; i < num_joints_; i++) {
+        pos[i] = cmd[i];
+        jntvalues_[i] = cmd[i];
+      }
+      return true;
+    }
     // build vntPose
     BCAP_VARIANT vntPose;
     vntPose.Type = VT_R8 | VT_ARRAY;
@@ -1014,6 +1029,13 @@ public:
 
   bool initialize(ros::NodeHandle& node, int num_joints)
   {
+    // Set dryrunp_ to true,  when no real robot exists
+    node.getParam("dryrun", dryrunp_);
+    if (dryrunp_)
+    {
+      ROS_WARN("running with loopback mode");
+    }
+
     num_joints_ = num_joints;
     // Determine ip address of the robot's embedded machine.
     if (!node.getParam("server_ip", server_ip_address_))

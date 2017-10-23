@@ -107,6 +107,7 @@ catkin_package(
 ## Build ##
 ###########
 
+add_compile_options(-std=c++11)
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(include  ${catkin_INCLUDE_DIRS})
@@ -149,11 +150,11 @@ target_link_libraries(denso_ros_control
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS denso_ros_control denso_ros_control_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS denso_ros_control
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
@@ -161,6 +162,9 @@ target_link_libraries(denso_ros_control
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
 # )
+
+install(DIRECTORY launch config
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
