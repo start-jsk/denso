@@ -46,6 +46,7 @@
   <build_depend>controller_manager</build_depend>
   <build_depend>joint_limits_interface</build_depend>
   <build_depend>position_controllers</build_depend>
+  <build_depend>joint_state_controller</build_depend>
   <build_depend>joint_trajectory_controller</build_depend>
   <build_depend>urdf</build_depend>
   <build_depend>kdl_parser</build_depend>
@@ -57,6 +58,7 @@
   <run_depend>controller_manager</run_depend>
   <run_depend>joint_limits_interface</run_depend>
   <run_depend>position_controllers</run_depend>
+  <run_depend>joint_state_controller</run_depend>
   <run_depend>joint_trajectory_controller</run_depend>
   <run_depend>urdf</run_depend>
   <run_depend>kdl_parser</run_depend>
