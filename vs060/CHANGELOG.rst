@@ -2,8 +2,8 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.2 (2017-11-01)
+------------------
 * Fix kinetic-devel (denso_ros_control) for simulation usage (`#88 <https://github.com/start-jsk/denso/issues/88>`_)
   * import dummy pyassimp: workaround until https://github.com/ros-planning/moveit/pull/581 is released
   * vs060/model/vs060A1_AV6_NNN_NNN.urdf: add missing safety_controller for j4

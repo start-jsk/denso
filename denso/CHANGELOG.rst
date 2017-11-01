@@ -2,8 +2,8 @@
 Changelog for package denso
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.2 (2017-11-01)
+------------------
 * [kinetic-devel] Update maintainers (`#85 <https://github.com/start-jsk/denso/issues/85>`_)
 * Contributors: Isaac I.Y. Saito
 

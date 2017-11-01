@@ -2,8 +2,8 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.2 (2017-11-01)
+------------------
 * Fix kinetic-devel (denso_ros_control) for simulation usage (`#88 <https://github.com/start-jsk/denso/issues/88>`_)
   * remove redundant code from demo_simulation_cage.launch
   * change arg name from mode to dryrun
