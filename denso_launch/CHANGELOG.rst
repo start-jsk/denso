@@ -2,6 +2,20 @@
 Changelog for package denso_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix kinetic-devel (denso_ros_control) for simulation usage (`#88 <https://github.com/start-jsk/denso/issues/88>`_)
+  * test_moveit.py: sleep before retry go()
+  * wait for /move_group/goal
+  * re-enable vs060.test, add workaround for pyassimp, run go() twice
+  * clean up launch file for newer demo.launch in vs060_moveit_config, which accepts dryrun argument
+  * rm denso_vs060_startup\_*
+  * update moveit configuration for new denso_ros_controller package
+* [kinetic-devel] Update maintainer (`#85 <https://github.com/start-jsk/denso/issues/85>`_)
+* Fix travis (`#87 <https://github.com/start-jsk/denso/issues/87>`_)
+  * test/vs060 failing due to missing denso_controller
+* Contributors: Isaac I.Y. Saito, Kei Okada
+
 2.0.1 (2017-08-09)
 ------------------
 

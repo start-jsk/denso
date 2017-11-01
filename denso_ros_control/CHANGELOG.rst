@@ -2,12 +2,26 @@
 Changelog for package denso_ros_control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix kinetic-devel (denso_ros_control) for simulation usage (`#88 <https://github.com/start-jsk/denso/issues/88>`_)
+  * add joint_state_controller
+  * add joint_trajectory_controller depends denso_ros_control/package.xml
+  * add position_controllers depends denso_ros_control/package.xml
+  * CMakeLists.txt: add install target
+  * position_control.launch: add --shutdown-timeout 0.1 to clean? shutdown of controllers
+  * position_control.launch: add server_ip, udp_timeout, server_port, dryrun arguments
+  * use position_trajectory_controller (use joint tarjectory action instead of poision conttoller for each joint)
+  * loopback read and write for dryrun mode
+  * skip fixed joint, see https://github.com/start-jsk/denso/issues/68#issuecomment-338449016
+* Contributors: Kei Okada
+
 2.0.1 (2017-08-09)
 ------------------
 
 2.0.0 (2017-08-09)
 ------------------
-* initial commit for supporting ros_control (`#82 <https://github.com/fkanehiro/hrpsys-base/issues/82>`)
+* initial commit for supporting ros_control (`#82 <https://github.com/start-jsk/denso/issues/82>`)
   * fix compilation error
   * initial commit for supporting ros_control
 

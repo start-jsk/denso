@@ -2,6 +2,18 @@
 Changelog for package vs060_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix kinetic-devel (denso_ros_control) for simulation usage (`#88 <https://github.com/start-jsk/denso/issues/88>`_)
+  * remove redundant code from demo_simulation_cage.launch
+  * change arg name from mode to dryrun
+  * run controller with position_control.launch, not launch in denso_launch
+  * Deprecation warning: Trajectory execution service is deprecated (was replaced by an action).
+    Replace 'MoveGroupExecuteService' with 'MoveGroupExecuteTrajectoryAction' in move_group.launch
+  * update moveit configuration for new denso_ros_controller package
+* [kinetic-devel] Update maintainer ( `#85 <https://github.com/start-jsk/denso/issues/85>`_ )
+* Contributors: Isaac I.Y. Saito, Kei Okada
+
 2.0.1 (2017-08-09)
 ------------------
 
