@@ -987,5 +987,5 @@ namespace vs060A1_AV6_NNN_NNN_manipulator_kinematics
 } // end namespace
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_DECLARE_CLASS(vs060A1_AV6_NNN_NNN_manipulator_kinematics, IKFastKinematicsPlugin, vs060A1_AV6_NNN_NNN_manipulator_kinematics::IKFastKinematicsPlugin, kinematics::KinematicsBase);
+PLUGINLIB_EXPORT_CLASS(vs060A1_AV6_NNN_NNN_manipulator_kinematics::IKFastKinematicsPlugin, kinematics::KinematicsBase);
 
