@@ -2,6 +2,12 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* check CMake version rather than ROS version (`#99 <https://github.com/start-jsk/denso/issues/99>`_)
+* Add c++11 compile option
+* Contributors: Mikael Arguedas, Ryosuke Tajima
+
 2.0.2 (2017-11-01)
 ------------------
 * Fix kinetic-devel (denso_ros_control) for simulation usage (`#88 <https://github.com/start-jsk/denso/issues/88>`_)

@@ -2,6 +2,9 @@
 Changelog for package vs060_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.0.2 (2017-11-01)
 ------------------
 * [kinetic-devel] Update maintainer (`#85 <https://github.com/start-jsk/denso/issues/85>`_)
