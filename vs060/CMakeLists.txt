@@ -2,6 +2,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vs060)
 
+add_compile_options(-std=c++11)
+
 find_package(catkin REQUIRED COMPONENTS roslang roscpp moveit_commander moveit_ros_planning)
 
 catkin_package(
@@ -15,7 +17,7 @@ include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 add_executable(publish_scene_from_text src/publish_scene_from_text.cpp)
 target_link_libraries(publish_scene_from_text ${catkin_LIBRARIES})
-if ($ENV{ROS_DISTRO} STRGREATER "indigo")
+if (${CMAKE_VERSION} VERSION_GREATER "3.1.3")
   target_compile_features(publish_scene_from_text PRIVATE cxx_range_for)
 endif()
 
