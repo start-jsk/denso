@@ -2,8 +2,8 @@
 Changelog for package vs060
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.3 (2018-04-24)
+------------------
 * check CMake version rather than ROS version (`#99 <https://github.com/start-jsk/denso/issues/99>`_)
 * Add c++11 compile option
 * Contributors: Mikael Arguedas, Ryosuke Tajima
