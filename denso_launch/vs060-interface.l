@@ -13,8 +13,8 @@
    (list
     (list
      ;;(cons :controller-action "arm_controller/joint_trajectory_action")
-     (cons :controller-action "/arm_controller/follow_joint_trajectory")
-     (cons :controller-state "arm_controller/state")
+     (cons :controller-action "/arm_controller/position_trajectory_controller/follow_joint_trajectory")
+     (cons :controller-state "arm_controller/position_trajectory_controller/state")
      ;;(cons :action-type pr2_controllers_msgs::JointTrajectoryAction)
      (cons :action-type control_msgs::FollowJointTrajectoryAction)
      (cons :joint-names (mapcar #'(lambda (n) (if (symbolp n) (symbol-name n) n)) (send-all (send robot :joint-list) :name))))))
